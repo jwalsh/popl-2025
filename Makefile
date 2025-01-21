@@ -93,3 +93,12 @@ bib-check:
 bib-format:
 	biber --tool --tool-resolve bib/popl2025.bib
 
+
+.PHONY: validate
+validate:
+	@scripts/validate-env.sh
+
+init: validate
+	@echo "Initializing environment..."
+	@[ -f .envrc.local ] || cp .envrc.sample .envrc.local
+	@direnv allow

@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Create environment validation script
-cat > scripts/validate-env.sh << 'END_VALIDATE'
-#!/bin/bash
-
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -113,24 +109,3 @@ fi
 
 echo -e "\nValidation complete with $errors error(s)"
 exit $((errors > 0))
-END_VALIDATE
-chmod +x scripts/validate-env.sh
-
-# Add validation to Makefile
-cat >> Makefile << 'END_MAKE'
-
-.PHONY: validate
-validate:
-	@scripts/validate-env.sh
-
-init: validate
-	@echo "Initializing environment..."
-	@[ -f .envrc.local ] || cp .envrc.sample .envrc.local
-	@direnv allow
-END_MAKE
-
-git add .
-git commit -m "Add environment validation script"
-git push origin main
-
-echo "Added environment validation! Run 'make validate' to check setup."
