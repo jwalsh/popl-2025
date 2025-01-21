@@ -63,3 +63,31 @@ Suggested bindings:
 
 * License
 MIT
+
+* Docker Support
+** Quick Start
+#+begin_src sh
+# Build image
+make docker-build
+
+# Generate exports
+make docker-export
+
+# Interactive shell
+make docker-shell
+#+end_src
+
+** Custom Export Commands
+Run any make target in Docker:
+#+begin_src sh
+docker-compose run --rm notes make html
+#+end_src
+
+* Environment Setup
+This repository includes Docker support for consistent environments:
+
+- Emacs 29.1
+- Org-mode with extras
+- Export tools pre-configured
+
+Use the provided Docker environment for reliable exports and consistent note-taking.

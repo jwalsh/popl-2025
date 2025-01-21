@@ -48,3 +48,15 @@ md:
 
 # Run all exports
 all-exports: html md
+
+# Docker targets
+.PHONY: docker-build docker-export docker-shell
+
+docker-build:
+	docker-compose build
+
+docker-export:
+	docker-compose run --rm notes
+
+docker-shell:
+	docker-compose run --rm notes /bin/bash

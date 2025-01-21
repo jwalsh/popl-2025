@@ -1,98 +1,111 @@
 #!/bin/bash
 
-# Create final emacs-lisp helper functions
-mkdir -p lisp
-cat > lisp/popl-helpers.el << 'END_ELISP'
-;;; popl-helpers.el --- POPL 2025 Conference Note Helpers
+# Create Dockerfile for consistent environment
+cat > Dockerfile << 'END_DOCKERFILE'
+FROM silex/emacs:29.1
 
-;;; Commentary:
-;; Helper functions for managing POPL 2025 conference notes
+# Install git and other essentials
+RUN apt-get update && apt-get install -y \
+    git \
+    make \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-;;; Code:
-(require 'org)
-(require 'org-agenda)
+# Set up workspace
+WORKDIR /workspace
+COPY . /workspace
 
-(defun popl-2025/tag-session (tag)
-  "Add TAG to current session heading."
-  (interactive "sTag: ")
-  (org-set-tags-to (cons tag (org-get-tags))))
+# Install org-mode extras
+RUN emacs --batch --eval "(progn \
+    (require 'package) \
+    (add-to-list 'package-archives '(\"melpa\" . \"https://melpa.org/packages/\") t) \
+    (package-initialize) \
+    (package-refresh-contents) \
+    (package-install 'ox-pandoc) \
+    (package-install 'org-ref))"
 
-(defun popl-2025/set-priority (priority)
-  "Set PRIORITY ([#A] [#B] [#C]) for current heading."
-  (interactive "cPriority [A/B/C]: ")
-  (org-priority priority))
+# Set up entrypoint for exports
+COPY scripts/docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]
 
-(defun popl-2025/generate-daily-agenda ()
-  "Generate agenda for current day's sessions."
-  (interactive)
-  (let ((org-agenda-files '("notes")))
-    (org-agenda nil "d")))
+CMD ["make", "all-exports"]
+END_DOCKERFILE
 
-(defun popl-2025/mark-for-followup ()
-  "Mark current item for follow-up."
-  (interactive)
-  (org-set-property "FOLLOW_UP" "t")
-  (org-set-tags-to (cons "followup" (org-get-tags))))
+# Create docker entrypoint script
+mkdir -p scripts
+cat > scripts/docker-entrypoint.sh << 'END_ENTRYPOINT'
+#!/bin/bash
+set -e
 
-(provide 'popl-helpers)
-;;; popl-helpers.el ends here
-END_ELISP
+# Initialize git config
+git config --global user.email "docker@popl2025.local"
+git config --global user.name "POPL Docker"
 
-# Add init.el for easy loading
-cat > init.el << 'END_INIT'
-;; Load path for popl helpers
-(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
-(require 'popl-helpers)
+exec "$@"
+END_ENTRYPOINT
 
-;; Org mode customizations
-(setq org-todo-keywords
-      '((sequence "TODO" "IN-PROGRESS" "WAITING" "DONE")))
+# Add docker compose file for easy usage
+cat > docker-compose.yml << 'END_COMPOSE'
+version: '3.8'
+services:
+  notes:
+    build: .
+    volumes:
+      - .:/workspace
+    command: make all-exports
+END_COMPOSE
 
-(setq org-tag-alist
-      '(("ai" . ?a)
-        ("verification" . ?v)
-        ("wasm" . ?w)
-        ("probabilistic" . ?p)
-        ("followup" . ?f)))
+# Update Makefile with Docker targets
+cat >> Makefile << 'END_MAKE'
 
-;; Custom agenda views
-(setq org-agenda-custom-commands
-      '(("p" "POPL Overview"
-         ((agenda "" ((org-agenda-span 'week)
-                     (org-agenda-start-day "2025-01-19")))
-          (tags "followup")
-          (todo "TODO")))))
-END_INIT
+# Docker targets
+.PHONY: docker-build docker-export docker-shell
 
-# Add a final README update
+docker-build:
+	docker-compose build
+
+docker-export:
+	docker-compose run --rm notes
+
+docker-shell:
+	docker-compose run --rm notes /bin/bash
+END_MAKE
+
+# Update README with Docker instructions
 cat >> README.org << 'END_README'
 
-* Emacs Configuration
-** Setup
-Add to your =init.el=:
-#+begin_src emacs-lisp
-(load "~/path/to/popl-2025/init.el")
+* Docker Support
+** Quick Start
+#+begin_src sh
+# Build image
+make docker-build
+
+# Generate exports
+make docker-export
+
+# Interactive shell
+make docker-shell
 #+end_src
 
-** Available Commands
-- =popl-2025/tag-session= - Tag current session
-- =popl-2025/set-priority= - Set session priority
-- =popl-2025/generate-daily-agenda= - View daily schedule
-- =popl-2025/mark-for-followup= - Mark for follow-up
-
-** Key Bindings
-Suggested bindings:
-#+begin_src emacs-lisp
-(global-set-key (kbd "C-c p t") 'popl-2025/tag-session)
-(global-set-key (kbd "C-c p p") 'popl-2025/set-priority)
-(global-set-key (kbd "C-c p a") 'popl-2025/generate-daily-agenda)
-(global-set-key (kbd "C-c p f") 'popl-2025/mark-for-followup)
+** Custom Export Commands
+Run any make target in Docker:
+#+begin_src sh
+docker-compose run --rm notes make html
 #+end_src
 
-* License
-MIT
+* Environment Setup
+This repository includes Docker support for consistent environments:
+
+- Emacs 29.1
+- Org-mode with extras
+- Export tools pre-configured
+
+Use the provided Docker environment for reliable exports and consistent note-taking.
 END_README
 
 git add .
-git commit -m "Add emacs-lisp helpers and final documentation"
+git commit -m "Add Docker support for reproducible environment"
 git push origin main
+
+echo "Added Docker support for reproducible exports!"
