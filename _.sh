@@ -1,126 +1,88 @@
 #!/bin/bash
 
-# Update monday.org with WAW track details
-cat > notes/monday.org << 'EOL'
-#+TITLE: POPL 2025 - Monday (WAW Track)
+# Update tuesday.org with AI/LLM and verification focus
+cat > notes/tuesday.org << 'EOL'
+#+TITLE: POPL 2025 - Tuesday (AI/LLM Focus)
 #+OPTIONS: toc:2 num:nil
 #+PROPERTY: header-args :tangle yes :mkdirp t
 
-* Schedule :wasm:systems:
-** Morning - WAW Track (Dodgeball) 
-*** [#A] 11:00-12:30 Session 1
-**** Full-Stack Correctness in Wasm: Eliminating Bugs Inside and Outside the Sandbox
+* Schedule :ai:llm:verification:
+** Morning - PEPM Track (Dodgeball)
+*** [#A] 11:00-12:30 High-level Abstraction
+**** The Missing Diagonal: High Level Languages for Low Level Systems
 :PROPERTIES:
-:SPEAKER: Chris Fallin
-:AFFILIATION: F5
+:SPEAKER: Satnam Singh
+:AFFILIATION: Groq
 :ROOM: Dodgeball
-:TRACK: WAW
+:RELEVANCE: Systems architecture for AI
 :END:
 ***** Notes
 
-*** [#A] 13:00-14:30 Session 2 
-**** Adventures in Making Wasm Fast and More Secure
+** Afternoon - PEPM/PADL Tracks
+*** [#A] 13:00-14:30 Language Design (Dodgeball)
+**** The Ethical Compiler
 :PROPERTIES:
-:SPEAKER: Shravan Ravi Narayan
+:SPEAKER: William J. Bowman
+:AFFILIATION: University of British Columbia
 :ROOM: Dodgeball
-:TRACK: WAW
+:RELEVANCE: AI system safety
 :END:
 ***** Notes
 
-** Afternoon - WAW Track (Dodgeball)
-*** [#B] 16:00-17:30 Session 3
-**** Experience Report: Stack Switching in Wasm SpecTec
+*** [#A] 16:00-17:30 AI Integration (Duck, Duck Goose)
+**** Leveraging LLM Reasoning with Dual Horn Programs
 :PROPERTIES:
-:AUTHORS: Yalun Liang, Sam Lindley, Andreas Rossberg
-:ROOM: Dodgeball
+:SPEAKER: Paul Tarau
+:AFFILIATION: University of North Texas
+:ROOM: Duck, Duck Goose
+:RELEVANCE: Core AI systems integration
 :END:
 ***** Notes
 
-*** [#A] 18:00-19:30 Session 4
-**** The WebAssembly Component Model
+**** [#A] Cyber Threat Detection with ASP
 :PROPERTIES:
-:AUTHORS: Lucy Menon, Luke Wagner
-:AFFILIATION: Microsoft, Fastly
-:ROOM: Dodgeball
+:AUTHORS: Fang Li, Fei Zuo, Gopal Gupta
+:ROOM: Duck, Duck Goose
+:RELEVANCE: Security architecture
 :END:
 ***** Notes
 
-* Questions to Ask
-** Component Model
-- Integration strategies with existing systems
+*** [#A] 18:00-19:30 LLM Panel (Dodgeball)
+**** Semantics-based program manipulation in the age of LLMs
+:PROPERTIES:
+:PANELISTS: William J. Bowman, Brigitte Pientka, Satnam Singh, Sam Lindley
+:ROOM: Dodgeball
+:RELEVANCE: Direct relevance to AI systems work
+:END:
+***** Panel Topics
+- LLM integration patterns
+- Verification approaches
+- Safety considerations
+***** Notes
+
+* Key Questions
+** LLM Integration
+- Verification approaches for LLM components
+- Safety guarantees in hybrid systems
+- Integration patterns with formal methods
+
+** System Architecture
+- Scalability of verification approaches
 - Performance characteristics
 - Security boundaries
 
-** Stack Switching
-- Implementation challenges
-- Use cases in production
-
 * Follow-ups
 ** Papers to Read
-- Full-Stack Correctness paper
-- Component Model spec
+- Dual Horn Programs paper for LLM reasoning
+- Ethical Compiler paper for safety considerations
 
 ** People to Meet
-- Chris Fallin re: system verification
-- WebAssembly Working Group members
+- Paul Tarau re: LLM reasoning
+- Panel members for AI systems discussion
 
-* Local Variables :noexport:
-# Local Variables:
-# org-confirm-babel-evaluate: nil
-# End:
-EOL
-
-# Add empty template files for scripts dir
-mkdir -p scripts/templates
-cat > scripts/templates/session.org << 'EOL'
-#+TITLE: POPL 2025 - %SESSION%
-#+DATE: %DATE%
-#+OPTIONS: toc:2 num:nil
-#+PROPERTY: header-args :tangle yes :mkdirp t
-
-* Session Overview
-:PROPERTIES:
-:TRACK: 
-:ROOM: 
-:TIME: 
-:END:
-
-* Notes
-
-* Questions Asked
-
-* Action Items
-
-* Local Variables :noexport:
-# Local Variables:
-# org-confirm-babel-evaluate: nil
-# End:
-EOL
-
-# Add paper template
-cat > scripts/templates/paper.org << 'EOL'
-#+TITLE: Paper Notes: %TITLE%
-#+DATE: %DATE%
-#+AUTHOR: Jason Walsh
-#+PROPERTY: header-args :tangle yes :mkdirp t
-
-* Overview
-:PROPERTIES:
-:AUTHORS: %AUTHORS%
-:CONFERENCE: POPL 2025
-:TRACK: %TRACK%
-:END:
-
-* Key Points
-
-* Questions
-
-* Implementation Ideas
-
-* Follow-ups
-** Research Threads
-** Related Papers
-** Potential Applications
+** Implementation Ideas
+- LLM verification framework extensions
+- Safety pattern implementation
 
 * Local Variables :noexport:
 # Local Variables:
@@ -129,4 +91,4 @@ cat > scripts/templates/paper.org << 'EOL'
 EOL
 
 git add .
-git commit -m "Add Monday schedule and templates"
+git commit -m "Add Tuesday schedule with AI/LLM focus"
