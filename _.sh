@@ -1,136 +1,123 @@
 #!/bin/bash
 
-# Create a papers management system
-mkdir -p papers/{distinguished,interesting,followup}
+# Create bibliography directory and main bib file
+mkdir -p bib
+cat > bib/popl2025.bib << 'END_BIB'
+% POPL 2025 Bibliography
 
-# Create paper management script
-cat > scripts/manage-paper.sh << 'END_PAPER'
+@conference{POPL2025,
+  title     = {POPL 2025: 52nd ACM SIGPLAN Symposium on Principles of Programming Languages},
+  booktitle = {POPL 2025},
+  year      = {2025},
+  address   = {Denver, Colorado},
+  month     = {January},
+  publisher = {ACM}
+}
+
+% Distinguished Papers
+@inproceedings{zaiser2025guaranteed,
+  title     = {Guaranteed Bounds on Posterior Distributions of Discrete Probabilistic Programs with Loops},
+  author    = {Zaiser, Fabian and Murawski, Andrzej and Ong, C.-H. Luke},
+  booktitle = {POPL 2025},
+  year      = {2025},
+  note      = {Distinguished Paper}
+}
+END_BIB
+
+# Create citation management script
+cat > scripts/cite-paper.sh << 'END_CITE'
 #!/bin/bash
 
-# Usage: ./manage-paper.sh <pdf_url> <category> <notes>
-# Categories: distinguished, interesting, followup
+# Usage: ./cite-paper.sh "Author" "Title" "Distinguished" "Notes"
 
-URL="$1"
-CATEGORY="$2"
-NOTES="$3"
-DATE=$(date +%Y%m%d)
+AUTHOR="$1"
+TITLE="$2"
+DISTINGUISHED="$3"
+NOTES="$4"
 
-if [ -z "$URL" ] || [ -z "$CATEGORY" ]; then
-    echo "Usage: $0 <pdf_url> <category> [notes]"
+if [ -z "$AUTHOR" ] || [ -z "$TITLE" ]; then
+    echo "Usage: $0 'Author' 'Title' [Distinguished] [Notes]"
     exit 1
 fi
 
-FILENAME="papers/${CATEGORY}/${DATE}-${URL##*/}"
-curl -L "$URL" -o "$FILENAME"
+# Generate BibTeX key
+KEY=$(echo "$AUTHOR" | cut -d' ' -f2 | tr '[:upper:]' '[:lower:]')${TITLE:0:4}2025
+KEY=$(echo "$KEY" | sed 's/[^a-z0-9]//g')
 
-# Create annotation template
-cat > "${FILENAME%.*}.org" << EOF
-#+TITLE: Paper Notes: ${URL##*/}
-#+DATE: $(date +%Y-%m-%d)
-#+CATEGORY: ${CATEGORY}
+cat >> bib/popl2025.bib << EOF
 
-* Paper Overview
-${NOTES:-"TBD"}
-
-* Key Points
-- 
-
-* Implementation Ideas
-- 
-
-* Questions
-- 
-
-* Follow-ups
-** Research Threads
-** Related Work
-** Potential Applications
-
-* Local Variables :noexport:
-# Local Variables:
-# org-confirm-babel-evaluate: nil
-# End:
+@inproceedings{${KEY},
+  title     = {${TITLE}},
+  author    = {${AUTHOR}},
+  booktitle = {POPL 2025},
+  year      = {2025}$([ ! -z "$DISTINGUISHED" ] && echo ",
+  note      = {Distinguished Paper}")
+}
 EOF
 
-echo "Paper downloaded to ${FILENAME}"
-echo "Annotation template created at ${FILENAME%.*}.org"
-END_PAPER
-chmod +x scripts/manage-paper.sh
+# Add to org notes if provided
+if [ ! -z "$NOTES" ]; then
+    cat > "notes/papers/${KEY}.org" << EOF
+#+TITLE: Notes: ${TITLE}
+#+CITE: @${KEY}
+#+DATE: $(date +%Y-%m-%d)
 
-# Create pandoc template for paper exports
-mkdir -p templates
-cat > templates/paper.tex << 'END_TEX'
-\documentclass[12pt]{article}
-\usepackage[margin=1in]{geometry}
-\usepackage{hyperref}
-\usepackage{fontspec}
-\usepackage{listings}
-\usepackage{xcolor}
+* Overview
+${NOTES}
 
-\title{POPL 2025 Paper Notes}
-\author{Jason Walsh}
-\date{\today}
+* Citation
+#+begin_src bibtex
+@inproceedings{${KEY},
+  title     = {${TITLE}},
+  author    = {${AUTHOR}},
+  booktitle = {POPL 2025},
+  year      = {2025}$([ ! -z "$DISTINGUISHED" ] && echo ",
+  note      = {Distinguished Paper}")
+}
+#+end_src
 
-\begin{document}
-\maketitle
+* Notes
+EOF
+fi
 
-$body$
+echo "Added citation ${KEY} to bibliography"
+END_CITE
+chmod +x scripts/cite-paper.sh
 
-\end{document}
-END_TEX
+# Add org-ref configuration
+cat > lisp/org-ref-config.el << 'END_ORG_REF'
+;;; org-ref-config.el --- Citation management configuration
 
-# Add paper management targets to Makefile
+(require 'org-ref)
+
+(setq org-ref-bibliography-notes "notes/papers/"
+      org-ref-default-bibliography '("bib/popl2025.bib")
+      org-ref-pdf-directory "papers/")
+
+(setq org-ref-completion-library 'org-ref-ivy-cite)
+
+(provide 'org-ref-config)
+END_ORG_REF
+
+# Update init.el
+echo '(require '"'"'org-ref-config)' >> init.el
+
+# Add citation targets to Makefile
 cat >> Makefile << 'END_MAKE'
 
-# Paper management targets
-.PHONY: papers-pdf papers-html papers-summary
+# Citation management
+.PHONY: bib-check bib-format
 
-papers-pdf:
-	pandoc papers/**/*.org \
-		--template=templates/paper.tex \
-		--pdf-engine=xelatex \
-		-o papers/summary.pdf
+bib-check:
+	biber --tool --validate-datamodel bib/popl2025.bib
 
-papers-html:
-	pandoc papers/**/*.org \
-		-o papers/summary.html \
-		--standalone \
-		--toc
+bib-format:
+	biber --tool --tool-resolve bib/popl2025.bib
 
-papers-summary:
-	@echo "Distinguished Papers:"
-	@ls -1 papers/distinguished
-	@echo "\nInteresting Papers:"
-	@ls -1 papers/interesting
-	@echo "\nFollow-up Papers:"
-	@ls -1 papers/followup
 END_MAKE
 
-# Update README with paper management info
-cat >> README.org << 'END_README'
-
-* Paper Management
-** Categories
-- =distinguished/= - Distinguished papers
-- =interesting/= - Papers for detailed review
-- =followup/= - Papers for future reference
-
-** Usage
-Add a paper:
-#+begin_src sh
-./scripts/manage-paper.sh <pdf_url> distinguished "Summary notes"
-#+end_src
-
-Generate summaries:
-#+begin_src sh
-make papers-pdf   # Create PDF summary
-make papers-html  # Create HTML summary
-make papers-summary # List papers by category
-#+end_src
-END_README
-
 git add .
-git commit -m "Add paper management system and annotation tools"
+git commit -m "Add citation management and BibTeX integration"
 git push origin main
 
-echo "Added paper management system! Use scripts/manage-paper.sh to add papers."
+echo "Added citation management! Use scripts/cite-paper.sh to add citations."

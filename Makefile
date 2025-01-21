@@ -83,3 +83,13 @@ papers-summary:
 	@ls -1 papers/interesting
 	@echo "\nFollow-up Papers:"
 	@ls -1 papers/followup
+
+# Citation management
+.PHONY: bib-check bib-format
+
+bib-check:
+	biber --tool --validate-datamodel bib/popl2025.bib
+
+bib-format:
+	biber --tool --tool-resolve bib/popl2025.bib
+

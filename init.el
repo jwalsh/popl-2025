@@ -20,3 +20,4 @@
                      (org-agenda-start-day "2025-01-19")))
           (tags "followup")
           (todo "TODO")))))
+(require 'org-ref-config)
