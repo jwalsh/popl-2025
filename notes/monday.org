@@ -1,0 +1,20 @@
+#+TITLE: POPL 2025 - Monday
+#+OPTIONS: toc:2 num:nil
+#+PROPERTY: header-args :tangle yes :mkdirp t
+
+* Schedule :monday:
+[Previous schedule content for monday]
+
+* Notes
+
+* Questions Asked
+
+* Follow-ups
+** Papers to Read
+** People to Meet
+** Ideas to Explore
+
+* Local Variables :noexport:
+# Local Variables:
+# org-confirm-babel-evaluate: nil
+# End:

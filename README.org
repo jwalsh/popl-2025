@@ -1,0 +1,40 @@
+#+TITLE: POPL 2025 Notes & Schedule
+#+AUTHOR: Jason Walsh
+#+EMAIL: jason@example.com
+#+PROPERTY: header-args :tangle yes :mkdirp t
+#+STARTUP: overview
+
+* POPL 2025 Overview :conf:
+:PROPERTIES:
+:DATES: January 19-25, 2025
+:LOCATION: Curtis Hotel, Denver
+:CONTEXT: Principal Engineer focus on AI/ML Systems
+:END:
+
+** Goals
+- Track state-of-the-art in LLM/AI systems verification
+- Connect with WebAssembly community
+- Understand latest probabilistic programming advances
+
+** Structure
+- Main track: POPL
+- Co-located: CPP, VMCAI
+- Key workshops: WAW, LAFI, PADL
+
+* Schedule & Notes :schedule:
+** [[file:notes/monday.org][Monday (WAW Track Focus)]] :wasm:systems:
+** [[file:notes/tuesday.org][Tuesday (AI/LLM Focus)]] :ai:llm:
+** [[file:notes/wednesday.org][Wednesday (Probabilistic)]] :prob:
+** [[file:notes/thursday.org][Thursday (Verification)]] :verification:
+** [[file:notes/friday.org][Friday (Proof Systems)]] :proofs:
+
+* Repository Structure :meta:
+- =docs/= - Conference materials
+- =notes/= - Daily detailed notes
+- =papers/= - Paper copies & annotations
+- =slides/= - Presentation materials
+
+* Local Variables :noexport:
+# Local Variables:
+# org-confirm-babel-evaluate: nil
+# End:

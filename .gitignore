@@ -1,0 +1,20 @@
+# Emacs/Org specific
+*~
+\#*\#
+*.aux
+*.log
+.#*
+auto/
+
+# PDFs (uncomment if you want to track papers)
+# *.pdf
+
+# OS specific
+.DS_Store
+.directory
+Thumbs.db
+
+# Build/temp directories
+dist/
+build/
+tmp/
