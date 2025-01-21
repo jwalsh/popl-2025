@@ -1,0 +1,36 @@
+# Discord webhook for conference updates
+export DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/..."
+
+# Conference details for scripts
+export CONF_NAME="POPL"
+export CONF_YEAR="2025"
+export CONF_LOCATION="Denver"
+
+# Paper management
+export PAPERS_DIR="$PWD/papers"
+export NOTES_DIR="$PWD/notes"
+export BIB_FILE="$PWD/bib/popl2025.bib"
+
+# GitHub configuration (for automation)
+export GITHUB_TOKEN=""
+export GITHUB_USER="jwalsh"
+export GITHUB_REPO="popl-2025"
+
+# Docker configuration
+export DOCKER_IMAGE_NAME="popl2025"
+export DOCKER_CONTAINER_NAME="popl2025-env"
+
+# Emacs configuration
+export EMACS_INIT_FILE="$PWD/init.el"
+export ORG_DIRECTORY="$PWD"
+
+# Optional: LaTeX configuration for paper exports
+export TEXMFHOME="$PWD/tex"
+export BIBINPUTS="$PWD/bib:"
+
+# Optional: Conference specific tools
+# export COQBIN="/usr/local/bin"
+# export AGDA_DIR="$HOME/.agda"
+
+# Add scripts to PATH
+export PATH="$PWD/scripts:$PATH"

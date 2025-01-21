@@ -30,3 +30,4 @@ reports/*
 
 # Local config
 .dir-locals.el
+.envrc
