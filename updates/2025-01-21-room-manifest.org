@@ -1,0 +1,50 @@
+#+TITLE: Room Changes - January 21, 2025
+#+PROPERTY: header-args :tangle yes :mkdirp t
+
+* Current Room Assignments :rooms:2ndfloor:
+** Tutorial Track
+- Location: Paper Room (2nd Floor)
+- Previously: Goose
+- Sessions:
+  - 11:00-12:30 Stateless Model Checking
+  - 13:00-14:30 Stateless Model Checking (continued)
+
+** PEPM Track
+- Location: Scissors Room (2nd Floor)
+- Previously: Dodgeball
+- Key Sessions:
+  - 11:00-12:30 High-level abstraction
+  - 13:00-14:30 Language design
+  - 16:00-17:30 Types and meta theory
+  - 18:00-19:30 Macros and LLMs
+
+** PADL Track
+- Location: Keep Away Room (2nd Floor)
+- Previously: Duck, Duck Goose
+- Key Sessions:
+  - 16:00-17:30 LLM & ASP Session
+
+* Navigation Notes :navigation:
+** 2nd Floor Layout
+- All relocated sessions are on 2nd floor
+- Follow posted signs
+- Some hallways closed due to water damage
+- Use main stairwell/elevator for access
+
+** Quick Reference
+| Track    | Room      | Notable Session                    | Time        |
+|----------+-----------+-----------------------------------+-------------|
+| Tutorial | Paper     | Stateless Model Checking          | 11:00-14:30 |
+| PEPM     | Scissors  | LLM Panel                         | 18:45-19:25 |
+| PADL     | Keep Away | LLM Reasoning with Horn Programs  | 16:30-17:00 |
+
+* Follow-up Actions :admin:
+- Updated all schedule files
+- Room signs in place
+- Directional signs posted
+- Staff briefed on changes
+
+* Local Variables :noexport:
+# Local Variables:
+# org-confirm-babel-evaluate: nil
+# End:
