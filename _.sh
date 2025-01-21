@@ -1,90 +1,129 @@
 #!/bin/bash
 
-# Update Wednesday's schedule focusing on probabilistic programming
-cat > notes/wednesday.org << 'END_WEDNESDAY'
-#+TITLE: POPL 2025 - Wednesday (Probabilistic Programming)
+# Add Thursday's schedule focusing on verification and decision procedures
+cat > notes/thursday.org << 'END_THURSDAY'
+#+TITLE: POPL 2025 - Thursday (Verification & Probabilistic)
 #+OPTIONS: toc:2 num:nil
 #+PROPERTY: header-args :tangle yes :mkdirp t
 
-* Schedule :probabilistic:systems:
-** Late Afternoon - POPL Track (Marco Polo)
-*** [#A] 17:00-18:20 Probabilistic Programming 1
-**** A quantitative probabilistic relational Hoare logic
+* Schedule :verification:probabilistic:
+** Early Afternoon - POPL Track (Marco Polo)
+*** [#A] 12:40-14:00 Probabilistic Programming 2
+**** Inference Plans for Hybrid Particle Filtering
 :PROPERTIES:
-:AUTHORS: Martin Avanzini, Gilles Barthe, Benjamin Gregoire, Davide Davoli
-:INSTITUTIONS: Inria, MPI-SP
+:AUTHORS: Ellie Y. Cheng et al.
+:INSTITUTIONS: MIT, IBM Research
 :ROOM: Marco Polo
-:RELEVANCE: Formal verification of probabilistic systems
+:RELEVANCE: Practical probabilistic inference
 :END:
 ***** Key Points
-- Focus on quantitative assertions
-- Overcomes randomness alignment restrictions
+- Hybrid particle filtering
+- Performance optimization approaches
 ***** Notes
 
-**** [#A] Approximate Relational Reasoning for Higher-Order Probabilistic Programs
+**** [#A] Guaranteed Bounds on Posterior Distributions (Distinguished Paper)
 :PROPERTIES:
-:AUTHORS: Philipp G. Haselwarter et al.
-:INSTITUTIONS: Aarhus University, NYU
-:RELEVANCE: Direct application to AI system verification
-:END:
-***** Key Points
-- Higher-order approximate reasoning
-- Integration with separation logic
-***** Notes
-
-**** [#B] Compositional imprecise probability
-:PROPERTIES:
-:AUTHORS: Jack Liell-Cock, Sam Staton
+:AUTHORS: Fabian Zaiser, Andrzej Murawski, C.-H. Luke Ong
 :INSTITUTION: University of Oxford
-:RELEVANCE: Uncertainty handling in systems
+:RELEVANCE: Critical for AI system guarantees
+:DISTINGUISHED: yes
+:END:
+***** Key Points
+- Automated bound computation
+- Loop handling
+***** Notes
+
+*** [#A] 15:20-16:20 Decision Procedures
+**** A Primal-Dual Perspective on Program Verification (Distinguished Paper)
+:PROPERTIES:
+:AUTHORS: Takeshi Tsukada, Hiroshi Unno, Oded Padon, Sharon Shoham
+:RELEVANCE: Core verification methodology
+:DISTINGUISHED: yes
+:END:
+***** Key Points
+- Unified verification framework
+- Practical algorithm development
+***** Notes
+
+**** Dis/Equality Graphs
+:PROPERTIES:
+:AUTHORS: George Zakhour et al.
+:INSTITUTION: University of St. Gallen
+:RELEVANCE: Program analysis infrastructure
 :END:
 ***** Notes
 
 * Key Questions
-** Verification Approaches
-- Integration with existing frameworks
-- Scaling to production systems
-- Handling uncertainty bounds
+** Verification Frameworks
+- Integration with existing tools
+- Scaling characteristics
+- Real-world applicability
 
-** Implementation Considerations
-- Performance characteristics
+** Probabilistic Systems
+- Bound computation strategies
+- Performance implications
 - Integration patterns
-- Tool support needed
 
 * Follow-ups
 ** Papers to Read
-- [#A] Approximate Relational Reasoning paper
-- [#A] Quantitative Hoare logic paper for system verification
+- [#A] Both Distinguished Papers
+- [#B] Particle filtering implementation
 
 ** People to Meet
-- Gilles Barthe re: verification approaches
-- Sam Staton re: compositional approaches
+- Oxford team re: bounds computation
+- Verification framework authors
 
 ** Implementation Ideas
-- Framework integration possibilities
-- Verification pipeline enhancements
+- Bound computation integration
+- Verification pipeline enhancement
 
 * Local Variables :noexport:
 # Local Variables:
 # org-confirm-babel-evaluate: nil
 # End:
-END_WEDNESDAY
+END_THURSDAY
 
-# Add pre-commit hooks for org-mode validation
-mkdir -p .git/hooks
-cat > .git/hooks/pre-commit << 'END_HOOK'
+# Add a script to fetch paper PDFs based on DOI
+cat > scripts/fetch-papers.sh << 'END_PAPER_SCRIPT'
 #!/bin/bash
 
-# Check org-mode syntax
-for file in $(git diff --cached --name-only | grep '\.org$'); do
-    if ! emacs --batch -l org --eval "(progn (find-file \"$file\") (org-lint))" 2>/dev/null; then
-        echo "Org-mode validation failed for $file"
-        exit 1
-    fi
-done
-END_HOOK
-chmod +x .git/hooks/pre-commit
+# Usage: ./fetch-papers.sh <doi>
+# Fetches paper PDFs and creates annotation templates
+
+DOI="$1"
+if [ -z "$DOI" ]; then
+    echo "Usage: $0 <doi>"
+    exit 1
+fi
+
+PAPER_DIR="papers/$(echo $DOI | tr '/' '_')"
+mkdir -p "$PAPER_DIR"
+
+# Create annotation template
+cat > "$PAPER_DIR/notes.org" << EOF
+#+TITLE: Paper Notes: $DOI
+#+DATE: $(date +%Y-%m-%d)
+#+PROPERTY: header-args :tangle yes :mkdirp t
+
+* Paper Overview
+:PROPERTIES:
+:DOI: $DOI
+:READ_DATE: $(date +%Y-%m-%d)
+:END:
+
+* Key Points
+
+* Implementation Notes
+
+* Questions
+
+* Follow-ups
+EOF
+
+echo "Created annotation template in $PAPER_DIR"
+END_PAPER_SCRIPT
+chmod +x scripts/fetch-papers.sh
 
 git add .
-git commit -m "Add Wednesday schedule with probabilistic programming focus and pre-commit hook"
+git commit -m "Add Thursday schedule with verification focus and paper fetching script"
 git push origin main
