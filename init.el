@@ -21,3 +21,4 @@
           (tags "followup")
           (todo "TODO")))))
 (require 'org-ref-config)
+(require 'popl-capture-templates)

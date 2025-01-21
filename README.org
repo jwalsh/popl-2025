@@ -149,3 +149,15 @@ Find session locations:
 #+begin_src sh
 ./scripts/room-finder.sh "Scissors"
 #+end_src
+
+* Quick Notes
+** Capture Templates
+Quick note capture with =C-c c=:
+- =s= Session note
+- =p= Paper note
+
+** Command Line
+Quick notes from terminal:
+#+begin_src sh
+./scripts/quick-note.sh "ethical-compiler" "Interesting points about type safety"
+#+end_src
