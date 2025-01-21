@@ -1,0 +1,26 @@
+#+TITLE: POPL 2025 Room Changes
+#+DATE: 2025-01-21
+#+PROPERTY: header-args :tangle yes :mkdirp t
+
+* Room Changes [2025-01-21]
+:PROPERTIES:
+:NOTICE_DATE: [2025-01-21 Tue]
+:REASON: Water damage
+:END:
+
+** Affected Tracks
+| Track       | Old Room    | New Room  | Floor |
+|-------------+-------------+-----------+-------|
+| PADL        | Duck, Duck  | Keep Away | 2nd   |
+| Tutorial    | Goose       | Paper     | 2nd   |
+| PEPM        | Dodgeball   | Scissors  | 2nd   |
+
+** Impact on Schedule
+- No changes to timing
+- Hallway access limited
+- Signs will be posted
+
+* Local Variables :noexport:
+# Local Variables:
+# org-confirm-babel-evaluate: nil
+# End:

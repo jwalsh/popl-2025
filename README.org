@@ -122,3 +122,12 @@ make papers-pdf   # Create PDF summary
 make papers-html  # Create HTML summary
 make papers-summary # List papers by category
 #+end_src
+
+* Updates :notice:
+** [2025-01-21] Room Changes
+Due to water damage, the following rooms have been relocated:
+- PADL → Keep Away (2nd floor)
+- Tutorial Fest → Paper (2nd floor)
+- PEPM → Scissors (2nd floor)
+
+See =updates/room-changes.org= for details.

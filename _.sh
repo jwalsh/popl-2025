@@ -1,125 +1,61 @@
 #!/bin/bash
 
-# Create test script to verify the setup
-cat > scripts/check-setup.sh << 'END_CHECK'
-#!/bin/bash
+# Create room change tracking
+mkdir -p updates
 
-echo "Checking POPL 2025 repository setup..."
+# Log the room changes
+cat > updates/room-changes.org << 'END_CHANGES'
+#+TITLE: POPL 2025 Room Changes
+#+DATE: 2025-01-21
+#+PROPERTY: header-args :tangle yes :mkdirp t
 
-# Check directory structure
-declare -a dirs=(
-    "notes" 
-    "papers/distinguished" 
-    "papers/interesting"
-    "papers/followup"
-    "docs"
-    "slides"
-    "bib"
-    "lisp"
-    "templates"
-    ".github/workflows"
-)
+* Room Changes [2025-01-21]
+:PROPERTIES:
+:NOTICE_DATE: [2025-01-21 Tue]
+:REASON: Water damage
+:END:
 
-for dir in "${dirs[@]}"; do
-    if [ -d "$dir" ]; then
-        echo "✓ $dir directory exists"
-    else
-        echo "✗ Missing $dir directory"
-        mkdir -p "$dir"
-    fi
+** Affected Tracks
+| Track       | Old Room    | New Room  | Floor |
+|-------------+-------------+-----------+-------|
+| PADL        | Duck, Duck  | Keep Away | 2nd   |
+| Tutorial    | Goose       | Paper     | 2nd   |
+| PEPM        | Dodgeball   | Scissors  | 2nd   |
+
+** Impact on Schedule
+- No changes to timing
+- Hallway access limited
+- Signs will be posted
+
+* Local Variables :noexport:
+# Local Variables:
+# org-confirm-babel-evaluate: nil
+# End:
+END_CHANGES
+
+# Update affected schedule files
+for f in notes/{tuesday,wednesday,thursday,friday}.org; do
+    sed -i.bak \
+        -e 's/Duck, Duck Goose/Keep Away/g' \
+        -e 's/Dodgeball/Scissors/g' \
+        "$f"
 done
 
-# Check essential files
-declare -a files=(
-    "README.org"
-    "Makefile"
-    "init.el"
-    "docker-compose.yml"
-    "Dockerfile"
-    "_config.yml"
-    "bib/popl2025.bib"
-)
+# Add room change notice to README
+cat >> README.org << 'END_UPDATE'
 
-for file in "${files[@]}"; do
-    if [ -f "$file" ]; then
-        echo "✓ $file exists"
-    else
-        echo "✗ Missing $file"
-    fi
-done
+* Updates :notice:
+** [2025-01-21] Room Changes
+Due to water damage, the following rooms have been relocated:
+- PADL → Keep Away (2nd floor)
+- Tutorial Fest → Paper (2nd floor)
+- PEPM → Scissors (2nd floor)
 
-# Check org files
-for day in monday tuesday wednesday thursday friday; do
-    if [ -f "notes/${day}.org" ]; then
-        echo "✓ ${day}.org exists"
-    else
-        echo "✗ Missing ${day}.org"
-    fi
-done
-
-# Test Docker setup
-if command -v docker &> /dev/null; then
-    echo "Testing Docker build..."
-    docker build -t popl2025-test . && echo "✓ Docker build succeeded" || echo "✗ Docker build failed"
-fi
-
-# Check GitHub setup
-if [ -d ".git" ]; then
-    echo "✓ Git repository initialized"
-    if git remote -v | grep -q "github.com"; then
-        echo "✓ GitHub remote configured"
-    else
-        echo "✗ GitHub remote not configured"
-    fi
-else
-    echo "✗ Not a git repository"
-fi
-
-echo "Setup check complete!"
-END_CHECK
-chmod +x scripts/check-setup.sh
-
-# Create quick start guide
-cat > QUICKSTART.md << 'END_QUICKSTART'
-# POPL 2025 Quick Start
-
-1. Clone repository:
-   ```sh
-   git clone https://github.com/jwalsh/popl-2025.git
-   cd popl-2025
-   ```
-
-2. Check setup:
-   ```sh
-   ./scripts/check-setup.sh
-   ```
-
-3. Initialize environment:
-   ```sh
-   # With Docker
-   make docker-build
-   
-   # Without Docker
-   make init
-   ```
-
-4. Start taking notes:
-   ```sh
-   # Daily notes in notes/
-   # Papers in papers/
-   # Citations in bib/popl2025.bib
-   ```
-
-5. Export content:
-   ```sh
-   make all-exports
-   ```
-
-See README.org for full documentation.
-END_QUICKSTART
+See =updates/room-changes.org= for details.
+END_UPDATE
 
 git add .
-git commit -m "Add setup verification and quick start guide"
+git commit -m "Update room assignments due to water damage"
 git push origin main
 
-echo "Repository setup complete! Run ./scripts/check-setup.sh to verify."
+echo "Room changes updated! Check updates/room-changes.org for details."
