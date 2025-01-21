@@ -131,3 +131,21 @@ Due to water damage, the following rooms have been relocated:
 - PEPM → Scissors (2nd floor)
 
 See =updates/room-changes.org= for details.
+
+* Quick Access
+- Room changes: [[file:ROOMS.org][ROOMS.org]]
+- Session notes: [[file:sessions][sessions/]]
+
+* Scripts
+** notify-updates.sh
+Send updates to Discord:
+#+begin_src sh
+export DISCORD_WEBHOOK_URL="..."
+./scripts/notify-updates.sh "Room change: PEPM moved to Scissors (2nd floor)"
+#+end_src
+
+** room-finder.sh
+Find session locations:
+#+begin_src sh
+./scripts/room-finder.sh "Scissors"
+#+end_src
