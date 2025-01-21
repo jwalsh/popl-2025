@@ -1,129 +1,144 @@
 #!/bin/bash
 
-# Add Thursday's schedule focusing on verification and decision procedures
-cat > notes/thursday.org << 'END_THURSDAY'
-#+TITLE: POPL 2025 - Thursday (Verification & Probabilistic)
+# Add Friday's schedule focusing on proof systems and final verification sessions
+cat > notes/friday.org << 'END_FRIDAY'
+#+TITLE: POPL 2025 - Friday (Proof Systems)
 #+OPTIONS: toc:2 num:nil
 #+PROPERTY: header-args :tangle yes :mkdirp t
 
-* Schedule :verification:probabilistic:
-** Early Afternoon - POPL Track (Marco Polo)
-*** [#A] 12:40-14:00 Probabilistic Programming 2
-**** Inference Plans for Hybrid Particle Filtering
+* Schedule :proofs:verification:
+** Afternoon - POPL Track (Marco Polo)
+*** [#A] 15:20-16:20 Verification 2
+**** Archmage and CompCertCast: End-to-End Verification
 :PROPERTIES:
-:AUTHORS: Ellie Y. Cheng et al.
-:INSTITUTIONS: MIT, IBM Research
+:AUTHORS: Yonghyun Kim et al.
+:INSTITUTION: Seoul National University
 :ROOM: Marco Polo
-:RELEVANCE: Practical probabilistic inference
+:RELEVANCE: Complete system verification pipeline
 :END:
 ***** Key Points
-- Hybrid particle filtering
-- Performance optimization approaches
+- Integer-pointer casting support
+- End-to-end verification
+- Framework integration
 ***** Notes
 
-**** [#A] Guaranteed Bounds on Posterior Distributions (Distinguished Paper)
+**** [#B] Formalising Graph Algorithms with Coinduction
 :PROPERTIES:
-:AUTHORS: Fabian Zaiser, Andrzej Murawski, C.-H. Luke Ong
-:INSTITUTION: University of Oxford
-:RELEVANCE: Critical for AI system guarantees
-:DISTINGUISHED: yes
+:AUTHORS: Donnacha Oisín Kidney, Nicolas Wu
+:INSTITUTIONS: Imperial College London
+:ROOM: Marco Polo
+:END:
+***** Notes
+
+*** [#A] 19:00-20:00 Proof Assistants (Peek-A-Boo)
+**** Progressful Interpreters for WebAssembly
+:PROPERTIES:
+:AUTHORS: Xiaojia Rao et al.
+:INSTITUTIONS: Imperial College London, NTU
+:ROOM: Peek-A-Boo
+:RELEVANCE: Direct application to Wasm work
 :END:
 ***** Key Points
-- Automated bound computation
-- Loop handling
+- Certified verification
+- Performance optimization
 ***** Notes
 
-*** [#A] 15:20-16:20 Decision Procedures
-**** A Primal-Dual Perspective on Program Verification (Distinguished Paper)
+**** Unifying compositional verification
 :PROPERTIES:
-:AUTHORS: Takeshi Tsukada, Hiroshi Unno, Oded Padon, Sharon Shoham
-:RELEVANCE: Core verification methodology
-:DISTINGUISHED: yes
+:AUTHORS: Yu Zhang et al.
+:INSTITUTIONS: Yale University
+:RELEVANCE: System-wide verification approach
 :END:
-***** Key Points
-- Unified verification framework
-- Practical algorithm development
 ***** Notes
 
-**** Dis/Equality Graphs
-:PROPERTIES:
-:AUTHORS: George Zakhour et al.
-:INSTITUTION: University of St. Gallen
-:RELEVANCE: Program analysis infrastructure
-:END:
-***** Notes
+* Implementation Focus
+** Verification Integration
+- CompCertCast integration possibilities
+- WebAssembly verification pipeline
+- Compositional approaches
+
+** Framework Development
+- Tool integration patterns
+- Performance considerations
+- Safety guarantees
 
 * Key Questions
-** Verification Frameworks
-- Integration with existing tools
-- Scaling characteristics
-- Real-world applicability
+** Technical Deep Dives
+- CompCertCast implementation details
+- WebAssembly interpreter certification
+- Verification scaling approaches
 
-** Probabilistic Systems
-- Bound computation strategies
+** Integration Strategies
+- Framework combination approaches
+- Tool integration patterns
 - Performance implications
-- Integration patterns
 
-* Follow-ups
-** Papers to Read
-- [#A] Both Distinguished Papers
-- [#B] Particle filtering implementation
+* Conference Wrap-up
+** Key Takeaways
+- Verification framework advances
+- WebAssembly ecosystem development
+- AI system verification approaches
 
-** People to Meet
-- Oxford team re: bounds computation
-- Verification framework authors
+** Action Items
+- [ ] Framework integration investigation
+- [ ] Tool evaluation for immediate use
+- [ ] Follow-up with key contacts
 
-** Implementation Ideas
-- Bound computation integration
-- Verification pipeline enhancement
+** Research Directions
+- System-wide verification approaches
+- AI/ML system certification
+- Performance optimization patterns
 
 * Local Variables :noexport:
 # Local Variables:
 # org-confirm-babel-evaluate: nil
 # End:
-END_THURSDAY
+END_FRIDAY
 
-# Add a script to fetch paper PDFs based on DOI
-cat > scripts/fetch-papers.sh << 'END_PAPER_SCRIPT'
+# Add a script for conference wrap-up report generation
+cat > scripts/generate-report.sh << 'END_REPORT_SCRIPT'
 #!/bin/bash
 
-# Usage: ./fetch-papers.sh <doi>
-# Fetches paper PDFs and creates annotation templates
+# Generate conference wrap-up report from notes
+REPORT_FILE="reports/popl-2025-summary.org"
+mkdir -p reports
 
-DOI="$1"
-if [ -z "$DOI" ]; then
-    echo "Usage: $0 <doi>"
-    exit 1
-fi
-
-PAPER_DIR="papers/$(echo $DOI | tr '/' '_')"
-mkdir -p "$PAPER_DIR"
-
-# Create annotation template
-cat > "$PAPER_DIR/notes.org" << EOF
-#+TITLE: Paper Notes: $DOI
+cat > "$REPORT_FILE" << EOF
+#+TITLE: POPL 2025 Conference Summary
 #+DATE: $(date +%Y-%m-%d)
+#+AUTHOR: Jason Walsh
+#+OPTIONS: toc:2 num:nil
 #+PROPERTY: header-args :tangle yes :mkdirp t
 
-* Paper Overview
-:PROPERTIES:
-:DOI: $DOI
-:READ_DATE: $(date +%Y-%m-%d)
-:END:
+* Conference Overview
+** Key Themes
+- AI System Verification
+- WebAssembly Evolution
+- Probabilistic Programming
+- Proof Systems
 
-* Key Points
+** Technical Highlights
+$(for f in notes/*.org; do
+    echo "*** $(basename $f .org)"
+    grep -A 2 "^\*\* Key" "$f" 2>/dev/null | sed 's/^/    /'
+done)
 
-* Implementation Notes
+** Action Items
+$(grep -h "\[.\]" notes/*.org 2>/dev/null | sort -u | sed 's/^/- /')
 
-* Questions
+** Follow-ups
+$(grep -h "^** Papers to Read" -A 3 notes/*.org 2>/dev/null | sed 's/^/  /')
 
-* Follow-ups
+* Local Variables :noexport:
+# Local Variables:
+# org-confirm-babel-evaluate: nil
+# End:
 EOF
 
-echo "Created annotation template in $PAPER_DIR"
-END_PAPER_SCRIPT
-chmod +x scripts/fetch-papers.sh
+echo "Generated conference summary at $REPORT_FILE"
+END_REPORT_SCRIPT
+chmod +x scripts/generate-report.sh
 
 git add .
-git commit -m "Add Thursday schedule with verification focus and paper fetching script"
+git commit -m "Add Friday schedule and conference report generator"
 git push origin main
