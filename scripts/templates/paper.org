@@ -1,0 +1,27 @@
+#+TITLE: Paper Notes: %TITLE%
+#+DATE: %DATE%
+#+AUTHOR: Jason Walsh
+#+PROPERTY: header-args :tangle yes :mkdirp t
+
+* Overview
+:PROPERTIES:
+:AUTHORS: %AUTHORS%
+:CONFERENCE: POPL 2025
+:TRACK: %TRACK%
+:END:
+
+* Key Points
+
+* Questions
+
+* Implementation Ideas
+
+* Follow-ups
+** Research Threads
+** Related Papers
+** Potential Applications
+
+* Local Variables :noexport:
+# Local Variables:
+# org-confirm-babel-evaluate: nil
+# End:

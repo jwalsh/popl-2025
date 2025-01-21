@@ -1,0 +1,22 @@
+#+TITLE: POPL 2025 - %SESSION%
+#+DATE: %DATE%
+#+OPTIONS: toc:2 num:nil
+#+PROPERTY: header-args :tangle yes :mkdirp t
+
+* Session Overview
+:PROPERTIES:
+:TRACK: 
+:ROOM: 
+:TIME: 
+:END:
+
+* Notes
+
+* Questions Asked
+
+* Action Items
+
+* Local Variables :noexport:
+# Local Variables:
+# org-confirm-babel-evaluate: nil
+# End:
