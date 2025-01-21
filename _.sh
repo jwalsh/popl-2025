@@ -1,95 +1,172 @@
 #!/bin/bash
 
-# Add org capture templates for quick session notes
-cat > lisp/popl-capture-templates.el << 'END_CAPTURE'
-;;; popl-capture-templates.el --- Quick capture templates for POPL 2025
+# Create enhanced Makefile with auto-help
+cat > Makefile << 'END_MAKEFILE'
+# Color output
+CYAN := \033[36m
+RESET := \033[0m
 
-(require 'org-capture)
+# Default target
+.DEFAULT_GOAL := help
 
-(setq org-capture-templates
-      `(("s" "Session Note" entry
-         (file+headline "notes/sessions/${slug}.org" "Notes")
-         ,(concat "* %^{Title}\n"
-                 ":PROPERTIES:\n"
-                 ":ROOM: %^{Room}\n"
-                 ":TIME: %^{Time}\n"
-                 ":SPEAKERS: %^{Speakers}\n"
-                 ":END:\n\n"
-                 "%?"))
-        ("p" "Paper Note" entry
-         (file+headline "papers/notes/${title}.org" "Notes")
-         ,(concat "* %^{Title}\n"
-                 ":PROPERTIES:\n"
-                 ":AUTHORS: %^{Authors}\n"
-                 ":PAPER_LINK: %^{Link}\n"
-                 ":READ_DATE: %t\n"
-                 ":END:\n\n"
-                 "** Summary\n%?\n"
-                 "** Key Points\n\n"
-                 "** Implementation Ideas\n"))))
+# Main targets
+.PHONY: all clean sync backup init validate export watch serve test
 
-(provide 'popl-capture-templates)
-END_CAPTURE
+## make : Show this help
+help:
+   @echo -e "$(CYAN)Available targets:$(RESET)"
+   @awk '/^[a-zA-Z\-_0-9]+:/ { \
+   	helpMessage = match(lastLine, /^## (.*)/); \
+   	if (helpMessage) { \
+   		helpCommand = substr($$1, 0, index($$1, ":")-1); \
+   		helpMessage = substr(lastLine, RSTART + 3, RLENGTH); \
+   		printf "  ${CYAN}%-15s$(RESET) %s\n", helpCommand, helpMessage; \
+   	} \
+   } \
+   { lastLine = $$0 }' $(MAKEFILE_LIST)
 
-# Add helper script for quick note taking
-cat > scripts/quick-note.sh << 'END_QUICK'
-#!/bin/bash
+## all : Run validation and sync
+all: validate sync
 
-# Usage: ./quick-note.sh "session" "Summary of the talk"
-SESSION="$1"
-NOTES="$2"
+## clean : Remove generated files
+clean:
+   rm -f **/*~
+   rm -f **/*.html
+   rm -f **/*.pdf
+   rm -rf dist/
 
-if [ -z "$SESSION" ]; then
-    echo "Usage: $0 <session> [notes]"
-    exit 1
-fi
+## sync : Sync with git repository
+sync:
+   git add .
+   git commit -m "Auto-sync conference notes"
+   git push
 
-# Create timestamped note
-TIMESTAMP=$(date +%Y%m%d-%H%M)
-FILE="notes/sessions/${SESSION}-${TIMESTAMP}.org"
+## backup : Create dated backup
+backup:
+   $(eval DATE := $(shell date +%Y%m%d))
+   tar czf ../popl-2025-backup-$(DATE).tar.gz .
 
-cat > "$FILE" << EOF
-#+TITLE: Quick Note: ${SESSION}
-#+DATE: $(date +%Y-%m-%d)
-#+TIME: $(date +%H:%M)
+## init : Initialize environment
+init: validate
+   @echo "Initializing environment..."
+   @[ -f .envrc.local ] || cp .envrc.sample .envrc.local
+   @direnv allow
+   @poetry install
 
-* Quick Notes
-${NOTES:-""}
+## validate : Check environment setup
+validate:
+   @scripts/validate-env.sh
 
-* Follow-ups
-EOF
+## export : Generate all exports (html, md, pdf)
+export: html md pdf
 
-echo "Created quick note at $FILE"
-END_QUICK
-chmod +x scripts/quick-note.sh
+## html : Generate HTML files
+html:
+   @echo "Generating HTML..."
+   @emacs --batch \
+   	--eval "(require 'ox-html)" \
+   	--eval "(dolist (f (directory-files-recursively \"./notes\" \"\\.org$$\")) \
+   		(with-current-buffer (find-file f) \
+   			(org-html-export-to-html)))"
 
-# Update init.el to load capture templates
-echo '(require '"'"'popl-capture-templates)' >> init.el
+## md : Generate Markdown files
+md:
+   @echo "Generating Markdown..."
+   @emacs --batch \
+   	--eval "(require 'ox-md)" \
+   	--eval "(dolist (f (directory-files-recursively \"./notes\" \"\\.org$$\")) \
+   		(with-current-buffer (find-file f) \
+   			(org-md-export-to-markdown)))"
 
-# Add to README
-cat >> README.org << 'END_README'
+## pdf : Generate PDF files
+pdf:
+   @echo "Generating PDFs..."
+   @emacs --batch \
+   	--eval "(require 'ox-latex)" \
+   	--eval "(dolist (f (directory-files-recursively \"./notes\" \"\\.org$$\")) \
+   		(with-current-buffer (find-file f) \
+   			(org-latex-export-to-pdf)))"
 
-* Quick Notes
-** Capture Templates
-Quick note capture with =C-c c=:
-- =s= Session note
-- =p= Paper note
+## watch : Watch for changes and auto-export
+watch:
+   @echo "Watching for changes..."
+   @watchexec -w notes/ -w papers/ "make export"
 
-** Command Line
-Quick notes from terminal:
-#+begin_src sh
-./scripts/quick-note.sh "ethical-compiler" "Interesting points about type safety"
-#+end_src
-END_README
+## serve : Start local server for exports
+serve:
+   @echo "Starting server on http://localhost:8000"
+   @python -m http.server 8000 --directory dist/
 
-git add .
-git commit -m "feat(notes): Add quick capture templates and CLI note taking
+## docker-build : Build Docker image
+docker-build:
+   docker-compose build
 
-- Add org-capture templates for sessions and papers
-- Add quick-note.sh for CLI note taking
-- Update documentation with quick note features
+## docker-export : Run exports in Docker
+docker-export:
+   docker-compose run --rm notes make export
 
-Related: Session and paper note taking workflow"
+## docker-shell : Start Docker shell
+docker-shell:
+   docker-compose run --rm notes /bin/bash
+
+## papers : Generate all paper summaries
+papers: papers-pdf papers-html papers-summary
+
+## papers-pdf : Generate PDF paper summary
+papers-pdf:
+   mkdir -p dist/papers
+   pandoc papers/**/*.org \
+   	--template=templates/paper.tex \
+   	--pdf-engine=xelatex \
+   	-o dist/papers/summary.pdf
+
+## papers-html : Generate HTML paper summary
+papers-html:
+   mkdir -p dist/papers
+   pandoc papers/**/*.org \
+   	-o dist/papers/summary.html \
+   	--standalone \
+   	--toc
+
+## papers-summary : List paper categories
+papers-summary:
+   @echo -e "$(CYAN)Distinguished Papers:$(RESET)"
+   @ls -1 papers/distinguished
+   @echo -e "\n$(CYAN)Interesting Papers:$(RESET)"
+   @ls -1 papers/interesting
+   @echo -e "\n$(CYAN)Follow-up Papers:$(RESET)"
+   @ls -1 papers/followup
+
+## bib : Run bibliography checks
+bib: bib-check bib-format
+
+## bib-check : Validate bibliography
+bib-check:
+   biber --tool --validate-datamodel bib/popl2025.bib
+
+## bib-format : Format bibliography
+bib-format:
+   biber --tool --tool-resolve bib/popl2025.bib
+
+## test : Run all tests
+test:
+   @echo "Running tests..."
+   @poetry run pytest
+   @scripts/check-setup.sh
+
+.PHONY: help
+END_MAKEFILE
+
+git add Makefile
+git commit -m "feat(make): Enhanced Makefile with auto-help and documentation
+
+- Add colored help output
+- Generate help from comments
+- Improve target organization
+- Add progress messages
+- Set help as default target
+
+For: Better developer experience"
 git push origin main
 
-echo "Added quick note taking features!"
+echo -e "\033[36mEnhanced Makefile with auto-help - run 'make' to see available commands\033[0m"

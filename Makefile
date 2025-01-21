@@ -8,146 +8,142 @@ RESET := \033[0m
 # Main targets
 .PHONY: all clean sync backup init validate export watch serve test
 
-## make : Show this help
+# Show help
 help:
-   @echo -e "$(CYAN)Available targets:$(RESET)"
-   @awk '/^[a-zA-Z\-_0-9]+:/ { \
-   	helpMessage = match(lastLine, /^## (.*)/); \
-   	if (helpMessage) { \
-   		helpCommand = substr($$1, 0, index($$1, ":")-1); \
-   		helpMessage = substr(lastLine, RSTART + 3, RLENGTH); \
-   		printf "  ${CYAN}%-15s$(RESET) %s\n", helpCommand, helpMessage; \
-   	} \
-   } \
-   { lastLine = $$0 }' $(MAKEFILE_LIST)
+	@echo -e "$(CYAN)Available targets:$(RESET)"
+	@awk '/^[a-zA-Z\-_0-9]+:/ { \
+		helpMessage = match(lastLine, /^# (.*)/); \
+		if (helpMessage) { \
+			helpCommand = substr($$1, 0, index($$1, ":")-1); \
+			helpMessage = substr(lastLine, RSTART + 2, RLENGTH); \
+			printf "  ${CYAN}%-15s$(RESET) %s\n", helpCommand, helpMessage; \
+		} \
+	} \
+	{ lastLine = $$0 }' $(MAKEFILE_LIST)
 
-## all : Run validation and sync
+# Run validation and sync
 all: validate sync
 
-## clean : Remove generated files
+# Remove generated files
 clean:
-   rm -f **/*~
-   rm -f **/*.html
-   rm -f **/*.pdf
-   rm -rf dist/
+	rm -f **/*~
+	rm -f **/*.html
+	rm -f **/*.pdf
+	rm -rf dist/
 
-## sync : Sync with git repository
+# Sync with git repository
 sync:
-   git add .
-   git commit -m "Auto-sync conference notes"
-   git push
+	git add .
+	git commit -m "Auto-sync conference notes"
+	git push
 
-## backup : Create dated backup
+# Create dated backup
 backup:
-   $(eval DATE := $(shell date +%Y%m%d))
-   tar czf ../popl-2025-backup-$(DATE).tar.gz .
+	$(eval DATE := $(shell date +%Y%m%d))
+	tar czf ../popl-2025-backup-$(DATE).tar.gz .
 
-## init : Initialize environment
+# Initialize environment
 init: validate
-   @echo "Initializing environment..."
-   @[ -f .envrc.local ] || cp .envrc.sample .envrc.local
-   @direnv allow
-   @poetry install
+	@echo "Initializing environment..."
+	@[ -f .envrc.local ] || cp .envrc.sample .envrc.local
+	@direnv allow
+	@poetry install
 
-## validate : Check environment setup
+# Check environment setup
 validate:
-   @scripts/validate-env.sh
+	@scripts/validate-env.sh
 
-## export : Generate all exports (html, md, pdf)
+# Generate all exports (html, md, pdf)
 export: html md pdf
 
-## html : Generate HTML files
+# Generate HTML files
 html:
-   @echo "Generating HTML..."
-   @emacs --batch \
-   	--eval "(require 'ox-html)" \
-   	--eval "(dolist (f (directory-files-recursively \"./notes\" \"\\.org$$\")) \
-   		(with-current-buffer (find-file f) \
-   			(org-html-export-to-html)))"
+	@echo "Generating HTML..."
+	@emacs --batch \
+		--eval "(require 'ox-html)" \
+		--eval "(dolist (f (directory-files-recursively \"./notes\" \"\\.org$$\")) \
+			(with-current-buffer (find-file f) \
+				(org-html-export-to-html)))"
 
-## md : Generate Markdown files
+# Generate Markdown files
 md:
-   @echo "Generating Markdown..."
-   @emacs --batch \
-   	--eval "(require 'ox-md)" \
-   	--eval "(dolist (f (directory-files-recursively \"./notes\" \"\\.org$$\")) \
-   		(with-current-buffer (find-file f) \
-   			(org-md-export-to-markdown)))"
+	@echo "Generating Markdown..."
+	@emacs --batch \
+		--eval "(require 'ox-md)" \
+		--eval "(dolist (f (directory-files-recursively \"./notes\" \"\\.org$$\")) \
+			(with-current-buffer (find-file f) \
+				(org-md-export-to-markdown)))"
 
-## pdf : Generate PDF files
+# Generate PDF files
 pdf:
-   @echo "Generating PDFs..."
-   @emacs --batch \
-   	--eval "(require 'ox-latex)" \
-   	--eval "(dolist (f (directory-files-recursively \"./notes\" \"\\.org$$\")) \
-   		(with-current-buffer (find-file f) \
-   			(org-latex-export-to-pdf)))"
+	@echo "Generating PDFs..."
+	@emacs --batch \
+		--eval "(require 'ox-latex)" \
+		--eval "(dolist (f (directory-files-recursively \"./notes\" \"\\.org$$\")) \
+			(with-current-buffer (find-file f) \
+				(org-latex-export-to-pdf)))"
 
-## watch : Watch for changes and auto-export
+# Watch for changes and auto-export
 watch:
-   @echo "Watching for changes..."
-   @watchexec -w notes/ -w papers/ "make export"
+	@echo "Watching for changes..."
+	@watchexec -w notes/ -w papers/ "make export"
 
-## serve : Start local server for exports
+# Start local server for exports
 serve:
-   @echo "Starting server on http://localhost:8000"
-   @python -m http.server 8000 --directory dist/
+	@echo "Starting server on http://localhost:8000"
+	@python -m http.server 8000 --directory dist/
 
-## docker-build : Build Docker image
+# Docker operations
 docker-build:
-   docker-compose build
+	docker-compose build
 
-## docker-export : Run exports in Docker
 docker-export:
-   docker-compose run --rm notes make export
+	docker-compose run --rm notes make export
 
-## docker-shell : Start Docker shell
 docker-shell:
-   docker-compose run --rm notes /bin/bash
+	docker-compose run --rm notes /bin/bash
 
-## papers : Generate all paper summaries
+# Generate all paper summaries
 papers: papers-pdf papers-html papers-summary
 
-## papers-pdf : Generate PDF paper summary
+# Generate PDF paper summary
 papers-pdf:
-   mkdir -p dist/papers
-   pandoc papers/**/*.org \
-   	--template=templates/paper.tex \
-   	--pdf-engine=xelatex \
-   	-o dist/papers/summary.pdf
+	mkdir -p dist/papers
+	pandoc papers/**/*.org \
+		--template=templates/paper.tex \
+		--pdf-engine=xelatex \
+		-o dist/papers/summary.pdf
 
-## papers-html : Generate HTML paper summary
+# Generate HTML paper summary
 papers-html:
-   mkdir -p dist/papers
-   pandoc papers/**/*.org \
-   	-o dist/papers/summary.html \
-   	--standalone \
-   	--toc
+	mkdir -p dist/papers
+	pandoc papers/**/*.org \
+		-o dist/papers/summary.html \
+		--standalone \
+		--toc
 
-## papers-summary : List paper categories
+# List paper categories
 papers-summary:
-   @echo -e "$(CYAN)Distinguished Papers:$(RESET)"
-   @ls -1 papers/distinguished
-   @echo -e "\n$(CYAN)Interesting Papers:$(RESET)"
-   @ls -1 papers/interesting
-   @echo -e "\n$(CYAN)Follow-up Papers:$(RESET)"
-   @ls -1 papers/followup
+	@echo -e "$(CYAN)Distinguished Papers:$(RESET)"
+	@ls -1 papers/distinguished
+	@echo -e "\n$(CYAN)Interesting Papers:$(RESET)"
+	@ls -1 papers/interesting
+	@echo -e "\n$(CYAN)Follow-up Papers:$(RESET)"
+	@ls -1 papers/followup
 
-## bib : Run bibliography checks
+# Bibliography management
 bib: bib-check bib-format
 
-## bib-check : Validate bibliography
+# Validate bibliography
 bib-check:
-   biber --tool --validate-datamodel bib/popl2025.bib
+	biber --tool --validate-datamodel bib/popl2025.bib
 
-## bib-format : Format bibliography
+# Format bibliography
 bib-format:
-   biber --tool --tool-resolve bib/popl2025.bib
+	biber --tool --tool-resolve bib/popl2025.bib
 
-## test : Run all tests
+# Run all tests
 test:
-   @echo "Running tests..."
-   @poetry run pytest
-   @scripts/check-setup.sh
-
-.PHONY: help
+	@echo "Running tests..."
+	@poetry run pytest
+	@scripts/check-setup.sh
