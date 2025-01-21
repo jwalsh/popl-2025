@@ -91,3 +91,15 @@ This repository includes Docker support for consistent environments:
 - Export tools pre-configured
 
 Use the provided Docker environment for reliable exports and consistent note-taking.
+
+* Published Notes
+The conference notes are automatically published to GitHub Pages:
+
+https://jwalsh.github.io/popl-2025/
+
+Updated on every push to main branch.
+
+* Navigation
+- Schedule by day in =notes/=
+- Paper annotations in =papers/=
+- Implementation ideas in =docs/=

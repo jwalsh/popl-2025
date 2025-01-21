@@ -1,0 +1,7 @@
+title: POPL 2025 Notes
+description: Conference notes and materials for POPL 2025
+theme: jekyll-theme-minimal
+
+# Site settings
+url: "https://jwalsh.github.io"
+baseurl: "/popl-2025"
