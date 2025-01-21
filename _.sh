@@ -1,114 +1,90 @@
 #!/bin/bash
 
-# Create GitHub Actions directory
-mkdir -p .github/workflows .github/PULL_REQUEST_TEMPLATE
+# Update Wednesday's schedule focusing on probabilistic programming
+cat > notes/wednesday.org << 'END_WEDNESDAY'
+#+TITLE: POPL 2025 - Wednesday (Probabilistic Programming)
+#+OPTIONS: toc:2 num:nil
+#+PROPERTY: header-args :tangle yes :mkdirp t
 
-# Create org-export action
-cat > .github/workflows/org-export.yml << 'END_WORKFLOW'
-name: Org Export
+* Schedule :probabilistic:systems:
+** Late Afternoon - POPL Track (Marco Polo)
+*** [#A] 17:00-18:20 Probabilistic Programming 1
+**** A quantitative probabilistic relational Hoare logic
+:PROPERTIES:
+:AUTHORS: Martin Avanzini, Gilles Barthe, Benjamin Gregoire, Davide Davoli
+:INSTITUTIONS: Inria, MPI-SP
+:ROOM: Marco Polo
+:RELEVANCE: Formal verification of probabilistic systems
+:END:
+***** Key Points
+- Focus on quantitative assertions
+- Overcomes randomness alignment restrictions
+***** Notes
 
-on:
-  push:
-    branches: [ main ]
-    paths:
-      - '**.org'
-  pull_request:
-    branches: [ main ]
-    paths:
-      - '**.org'
+**** [#A] Approximate Relational Reasoning for Higher-Order Probabilistic Programs
+:PROPERTIES:
+:AUTHORS: Philipp G. Haselwarter et al.
+:INSTITUTIONS: Aarhus University, NYU
+:RELEVANCE: Direct application to AI system verification
+:END:
+***** Key Points
+- Higher-order approximate reasoning
+- Integration with separation logic
+***** Notes
 
-jobs:
-  export:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Emacs
-        uses: purcell/setup-emacs@master
-        with:
-          version: 28.2
-          
-      - name: Export Org files
-        run: |
-          emacs --batch \
-            --eval "(progn \
-              (require 'ox-md) \
-              (require 'org) \
-              (dolist (f (directory-files-recursively \"./\" \"\\.org$\")) \
-                (with-current-buffer (find-file f) \
-                  (org-md-export-to-markdown))))"
+**** [#B] Compositional imprecise probability
+:PROPERTIES:
+:AUTHORS: Jack Liell-Cock, Sam Staton
+:INSTITUTION: University of Oxford
+:RELEVANCE: Uncertainty handling in systems
+:END:
+***** Notes
 
-      - name: Commit changes
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add *.md
-          git commit -m "Auto-generate markdown from org files" || echo "No changes to commit"
-          git push
-END_WORKFLOW
+* Key Questions
+** Verification Approaches
+- Integration with existing frameworks
+- Scaling to production systems
+- Handling uncertainty bounds
 
-# Create PR template
-cat > .github/PULL_REQUEST_TEMPLATE/pull_request_template.md << 'END_PR'
-## Description
-Brief description of the changes
+** Implementation Considerations
+- Performance characteristics
+- Integration patterns
+- Tool support needed
 
-## Type of change
-- [ ] Conference notes
-- [ ] Paper summaries
-- [ ] Implementation ideas
-- [ ] Documentation
-- [ ] Other
+* Follow-ups
+** Papers to Read
+- [#A] Approximate Relational Reasoning paper
+- [#A] Quantitative Hoare logic paper for system verification
 
-## Related Issues
-Fixes # (issue)
+** People to Meet
+- Gilles Barthe re: verification approaches
+- Sam Staton re: compositional approaches
 
-## Additional context
-Add any other context about the PR here
-END_PR
+** Implementation Ideas
+- Framework integration possibilities
+- Verification pipeline enhancements
 
-# Add contributing guidelines
-cat > CONTRIBUTING.md << 'END_CONTRIB'
-# Contributing to POPL 2025 Notes
+* Local Variables :noexport:
+# Local Variables:
+# org-confirm-babel-evaluate: nil
+# End:
+END_WEDNESDAY
 
-## Structure
-- Use org-mode for all notes
-- Follow existing templates in scripts/templates
-- Include session metadata in PROPERTIES drawers
+# Add pre-commit hooks for org-mode validation
+mkdir -p .git/hooks
+cat > .git/hooks/pre-commit << 'END_HOOK'
+#!/bin/bash
 
-## Pull Requests
-- Create feature branches
-- Use meaningful commit messages
-- Add paper references where applicable
-END_CONTRIB
-
-# Update Makefile with export targets
-cat >> Makefile << 'END_MAKE'
-
-# Export targets
-.PHONY: html md all-exports
-
-# Generate HTML from org files
-html:
-	emacs --batch \
-		--eval "(require 'ox-html)" \
-		--eval "(dolist (f (directory-files-recursively \"./\" \"\\.org$$\")) \
-			(with-current-buffer (find-file f) \
-				(org-html-export-to-html)))"
-
-# Export to markdown
-md:
-	emacs --batch \
-		--eval "(require 'ox-md)" \
-		--eval "(dolist (f (directory-files-recursively \"./\" \"\\.org$$\")) \
-			(with-current-buffer (find-file f) \
-				(org-md-export-to-markdown)))"
-
-# Run all exports
-all-exports: html md
-END_MAKE
+# Check org-mode syntax
+for file in $(git diff --cached --name-only | grep '\.org$'); do
+    if ! emacs --batch -l org --eval "(progn (find-file \"$file\") (org-lint))" 2>/dev/null; then
+        echo "Org-mode validation failed for $file"
+        exit 1
+    fi
+done
+END_HOOK
+chmod +x .git/hooks/pre-commit
 
 git add .
-git commit -m "Add GitHub Actions and contribution guidelines"
+git commit -m "Add Wednesday schedule with probabilistic programming focus and pre-commit hook"
 git push origin main
-
-echo "GitHub Actions and guidelines added successfully!"
