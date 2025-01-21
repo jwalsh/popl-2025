@@ -1,94 +1,114 @@
 #!/bin/bash
 
-# Update tuesday.org with AI/LLM and verification focus
-cat > notes/tuesday.org << 'EOL'
-#+TITLE: POPL 2025 - Tuesday (AI/LLM Focus)
-#+OPTIONS: toc:2 num:nil
-#+PROPERTY: header-args :tangle yes :mkdirp t
+# Create GitHub Actions directory
+mkdir -p .github/workflows .github/PULL_REQUEST_TEMPLATE
 
-* Schedule :ai:llm:verification:
-** Morning - PEPM Track (Dodgeball)
-*** [#A] 11:00-12:30 High-level Abstraction
-**** The Missing Diagonal: High Level Languages for Low Level Systems
-:PROPERTIES:
-:SPEAKER: Satnam Singh
-:AFFILIATION: Groq
-:ROOM: Dodgeball
-:RELEVANCE: Systems architecture for AI
-:END:
-***** Notes
+# Create org-export action
+cat > .github/workflows/org-export.yml << 'END_WORKFLOW'
+name: Org Export
 
-** Afternoon - PEPM/PADL Tracks
-*** [#A] 13:00-14:30 Language Design (Dodgeball)
-**** The Ethical Compiler
-:PROPERTIES:
-:SPEAKER: William J. Bowman
-:AFFILIATION: University of British Columbia
-:ROOM: Dodgeball
-:RELEVANCE: AI system safety
-:END:
-***** Notes
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '**.org'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '**.org'
 
-*** [#A] 16:00-17:30 AI Integration (Duck, Duck Goose)
-**** Leveraging LLM Reasoning with Dual Horn Programs
-:PROPERTIES:
-:SPEAKER: Paul Tarau
-:AFFILIATION: University of North Texas
-:ROOM: Duck, Duck Goose
-:RELEVANCE: Core AI systems integration
-:END:
-***** Notes
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Emacs
+        uses: purcell/setup-emacs@master
+        with:
+          version: 28.2
+          
+      - name: Export Org files
+        run: |
+          emacs --batch \
+            --eval "(progn \
+              (require 'ox-md) \
+              (require 'org) \
+              (dolist (f (directory-files-recursively \"./\" \"\\.org$\")) \
+                (with-current-buffer (find-file f) \
+                  (org-md-export-to-markdown))))"
 
-**** [#A] Cyber Threat Detection with ASP
-:PROPERTIES:
-:AUTHORS: Fang Li, Fei Zuo, Gopal Gupta
-:ROOM: Duck, Duck Goose
-:RELEVANCE: Security architecture
-:END:
-***** Notes
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add *.md
+          git commit -m "Auto-generate markdown from org files" || echo "No changes to commit"
+          git push
+END_WORKFLOW
 
-*** [#A] 18:00-19:30 LLM Panel (Dodgeball)
-**** Semantics-based program manipulation in the age of LLMs
-:PROPERTIES:
-:PANELISTS: William J. Bowman, Brigitte Pientka, Satnam Singh, Sam Lindley
-:ROOM: Dodgeball
-:RELEVANCE: Direct relevance to AI systems work
-:END:
-***** Panel Topics
-- LLM integration patterns
-- Verification approaches
-- Safety considerations
-***** Notes
+# Create PR template
+cat > .github/PULL_REQUEST_TEMPLATE/pull_request_template.md << 'END_PR'
+## Description
+Brief description of the changes
 
-* Key Questions
-** LLM Integration
-- Verification approaches for LLM components
-- Safety guarantees in hybrid systems
-- Integration patterns with formal methods
+## Type of change
+- [ ] Conference notes
+- [ ] Paper summaries
+- [ ] Implementation ideas
+- [ ] Documentation
+- [ ] Other
 
-** System Architecture
-- Scalability of verification approaches
-- Performance characteristics
-- Security boundaries
+## Related Issues
+Fixes # (issue)
 
-* Follow-ups
-** Papers to Read
-- Dual Horn Programs paper for LLM reasoning
-- Ethical Compiler paper for safety considerations
+## Additional context
+Add any other context about the PR here
+END_PR
 
-** People to Meet
-- Paul Tarau re: LLM reasoning
-- Panel members for AI systems discussion
+# Add contributing guidelines
+cat > CONTRIBUTING.md << 'END_CONTRIB'
+# Contributing to POPL 2025 Notes
 
-** Implementation Ideas
-- LLM verification framework extensions
-- Safety pattern implementation
+## Structure
+- Use org-mode for all notes
+- Follow existing templates in scripts/templates
+- Include session metadata in PROPERTIES drawers
 
-* Local Variables :noexport:
-# Local Variables:
-# org-confirm-babel-evaluate: nil
-# End:
-EOL
+## Pull Requests
+- Create feature branches
+- Use meaningful commit messages
+- Add paper references where applicable
+END_CONTRIB
+
+# Update Makefile with export targets
+cat >> Makefile << 'END_MAKE'
+
+# Export targets
+.PHONY: html md all-exports
+
+# Generate HTML from org files
+html:
+	emacs --batch \
+		--eval "(require 'ox-html)" \
+		--eval "(dolist (f (directory-files-recursively \"./\" \"\\.org$$\")) \
+			(with-current-buffer (find-file f) \
+				(org-html-export-to-html)))"
+
+# Export to markdown
+md:
+	emacs --batch \
+		--eval "(require 'ox-md)" \
+		--eval "(dolist (f (directory-files-recursively \"./\" \"\\.org$$\")) \
+			(with-current-buffer (find-file f) \
+				(org-md-export-to-markdown)))"
+
+# Run all exports
+all-exports: html md
+END_MAKE
 
 git add .
-git commit -m "Add Tuesday schedule with AI/LLM focus"
+git commit -m "Add GitHub Actions and contribution guidelines"
+git push origin main
+
+echo "GitHub Actions and guidelines added successfully!"

@@ -1,0 +1,40 @@
+name: Org Export
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '**.org'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '**.org'
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Emacs
+        uses: purcell/setup-emacs@master
+        with:
+          version: 28.2
+          
+      - name: Export Org files
+        run: |
+          emacs --batch \
+            --eval "(progn \
+              (require 'ox-md) \
+              (require 'org) \
+              (dolist (f (directory-files-recursively \"./\" \"\\.org$\")) \
+                (with-current-buffer (find-file f) \
+                  (org-md-export-to-markdown))))"
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add *.md
+          git commit -m "Auto-generate markdown from org files" || echo "No changes to commit"
+          git push
