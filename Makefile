@@ -60,3 +60,26 @@ docker-export:
 
 docker-shell:
 	docker-compose run --rm notes /bin/bash
+
+# Paper management targets
+.PHONY: papers-pdf papers-html papers-summary
+
+papers-pdf:
+	pandoc papers/**/*.org \
+		--template=templates/paper.tex \
+		--pdf-engine=xelatex \
+		-o papers/summary.pdf
+
+papers-html:
+	pandoc papers/**/*.org \
+		-o papers/summary.html \
+		--standalone \
+		--toc
+
+papers-summary:
+	@echo "Distinguished Papers:"
+	@ls -1 papers/distinguished
+	@echo "\nInteresting Papers:"
+	@ls -1 papers/interesting
+	@echo "\nFollow-up Papers:"
+	@ls -1 papers/followup

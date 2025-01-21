@@ -1,96 +1,136 @@
 #!/bin/bash
 
-# Create GitHub Pages workflow
-mkdir -p .github/workflows
-cat > .github/workflows/pages.yml << 'END_PAGES'
-name: GitHub Pages
+# Create a papers management system
+mkdir -p papers/{distinguished,interesting,followup}
 
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+# Create paper management script
+cat > scripts/manage-paper.sh << 'END_PAPER'
+#!/bin/bash
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+# Usage: ./manage-paper.sh <pdf_url> <category> <notes>
+# Categories: distinguished, interesting, followup
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    container:
-      image: silex/emacs:29.1
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Install dependencies
-        run: |
-          apt-get update
-          apt-get install -y make git
-          
-      - name: Generate exports
-        run: |
-          emacs --batch \
-            --eval "(require 'ox-html)" \
-            --eval "(require 'org)" \
-            --eval "(dolist (f (directory-files-recursively \"./notes\" \"\\.org$\")) \
-                     (with-current-buffer (find-file f) \
-                       (org-html-export-to-html)))"
-                       
-      - name: Generate index
-        run: |
-          echo "# POPL 2025 Notes" > index.md
-          echo "## Daily Notes" >> index.md
-          for f in notes/*.html; do
-            echo "* [$(basename $f .html)](${f})" >> index.md
-          done
-          
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          path: '.'
+URL="$1"
+CATEGORY="$2"
+NOTES="$3"
+DATE=$(date +%Y%m%d)
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2
-END_PAGES
+if [ -z "$URL" ] || [ -z "$CATEGORY" ]; then
+    echo "Usage: $0 <pdf_url> <category> [notes]"
+    exit 1
+fi
 
-# Add site configuration for GitHub Pages
-cat > _config.yml << 'END_CONFIG'
-title: POPL 2025 Notes
-description: Conference notes and materials for POPL 2025
-theme: jekyll-theme-minimal
+FILENAME="papers/${CATEGORY}/${DATE}-${URL##*/}"
+curl -L "$URL" -o "$FILENAME"
 
-# Site settings
-url: "https://jwalsh.github.io"
-baseurl: "/popl-2025"
-END_CONFIG
+# Create annotation template
+cat > "${FILENAME%.*}.org" << EOF
+#+TITLE: Paper Notes: ${URL##*/}
+#+DATE: $(date +%Y-%m-%d)
+#+CATEGORY: ${CATEGORY}
 
-# Update README with Pages info
+* Paper Overview
+${NOTES:-"TBD"}
+
+* Key Points
+- 
+
+* Implementation Ideas
+- 
+
+* Questions
+- 
+
+* Follow-ups
+** Research Threads
+** Related Work
+** Potential Applications
+
+* Local Variables :noexport:
+# Local Variables:
+# org-confirm-babel-evaluate: nil
+# End:
+EOF
+
+echo "Paper downloaded to ${FILENAME}"
+echo "Annotation template created at ${FILENAME%.*}.org"
+END_PAPER
+chmod +x scripts/manage-paper.sh
+
+# Create pandoc template for paper exports
+mkdir -p templates
+cat > templates/paper.tex << 'END_TEX'
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{fontspec}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\title{POPL 2025 Paper Notes}
+\author{Jason Walsh}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+$body$
+
+\end{document}
+END_TEX
+
+# Add paper management targets to Makefile
+cat >> Makefile << 'END_MAKE'
+
+# Paper management targets
+.PHONY: papers-pdf papers-html papers-summary
+
+papers-pdf:
+	pandoc papers/**/*.org \
+		--template=templates/paper.tex \
+		--pdf-engine=xelatex \
+		-o papers/summary.pdf
+
+papers-html:
+	pandoc papers/**/*.org \
+		-o papers/summary.html \
+		--standalone \
+		--toc
+
+papers-summary:
+	@echo "Distinguished Papers:"
+	@ls -1 papers/distinguished
+	@echo "\nInteresting Papers:"
+	@ls -1 papers/interesting
+	@echo "\nFollow-up Papers:"
+	@ls -1 papers/followup
+END_MAKE
+
+# Update README with paper management info
 cat >> README.org << 'END_README'
 
-* Published Notes
-The conference notes are automatically published to GitHub Pages:
+* Paper Management
+** Categories
+- =distinguished/= - Distinguished papers
+- =interesting/= - Papers for detailed review
+- =followup/= - Papers for future reference
 
-https://jwalsh.github.io/popl-2025/
+** Usage
+Add a paper:
+#+begin_src sh
+./scripts/manage-paper.sh <pdf_url> distinguished "Summary notes"
+#+end_src
 
-Updated on every push to main branch.
-
-* Navigation
-- Schedule by day in =notes/=
-- Paper annotations in =papers/=
-- Implementation ideas in =docs/=
+Generate summaries:
+#+begin_src sh
+make papers-pdf   # Create PDF summary
+make papers-html  # Create HTML summary
+make papers-summary # List papers by category
+#+end_src
 END_README
 
 git add .
-git commit -m "Add GitHub Pages deployment"
+git commit -m "Add paper management system and annotation tools"
 git push origin main
 
-echo "Added GitHub Pages support! Visit https://jwalsh.github.io/popl-2025/ once deployed."
+echo "Added paper management system! Use scripts/manage-paper.sh to add papers."

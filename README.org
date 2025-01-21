@@ -103,3 +103,22 @@ Updated on every push to main branch.
 - Schedule by day in =notes/=
 - Paper annotations in =papers/=
 - Implementation ideas in =docs/=
+
+* Paper Management
+** Categories
+- =distinguished/= - Distinguished papers
+- =interesting/= - Papers for detailed review
+- =followup/= - Papers for future reference
+
+** Usage
+Add a paper:
+#+begin_src sh
+./scripts/manage-paper.sh <pdf_url> distinguished "Summary notes"
+#+end_src
+
+Generate summaries:
+#+begin_src sh
+make papers-pdf   # Create PDF summary
+make papers-html  # Create HTML summary
+make papers-summary # List papers by category
+#+end_src
