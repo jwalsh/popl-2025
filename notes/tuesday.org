@@ -2,42 +2,157 @@
 #+OPTIONS: toc:2 num:nil
 #+PROPERTY: header-args :tangle yes :mkdirp t
 
-* Schedule :ai:llm:verification:
-** Morning - [NEW] Tutorial Track (Paper Room, 2nd Floor) :tutorial:
-*** [#A] 11:00-12:30 Stateless Model Checking
+* Schedule :ai:llm:verification:rooms:
+** Morning - Tutorial Track (Paper Room, 2nd Floor)
+*** TODO [#A] 11:00-12:30 Stateless Model Checking Tutorial
 :PROPERTIES:
 :ROOM: Paper (2nd Floor)
-:SPEAKERS: Michalis Kokologiannakis, Viktor Vafeiadis
-:INSTITUTIONS: ETH Zurich, MPI-SWS
+:TRACK: Tutorial
+:SPEAKERS: Michalis Kokologiannakis (ETH Zurich), Viktor Vafeiadis (MPI-SWS)
+:LINKS: https://plv.mpi-sws.org/genmc/popl2025/
+:RELEVANCE: System verification methodology
 :END:
+**** Topics
+- SMC fundamentals
+- Application to concurrent code
+- Performance estimation
+- Verification efficiency
 **** Notes
 
-** Afternoon - PEPM Track (Scissors Room, 2nd Floor) :pepm:
-*** [#A] 13:00-14:30 Language Design
-**** The Ethical Compiler
+*** TODO [#B] 13:00-14:30 Tutorial Continued
+:PROPERTIES:
+:ROOM: Paper (2nd Floor)
+:TRACK: Tutorial
+:END:
+**** Practical Session
+
+** Afternoon - PEPM Track (Scissors Room, 2nd Floor)
+*** TODO [#A] 13:00-14:30 Language Design
+**** The Ethical Compiler (Invited Talk)
 :PROPERTIES:
 :SPEAKER: William J. Bowman
+:AFFILIATION: University of British Columbia
 :ROOM: Scissors (2nd Floor)
-:RELEVANCE: AI system safety
+:LINKS: DOI, Pre-print available
+:RELEVANCE: AI system safety and ethics
 :END:
-**** Notes
+***** Key Points
+- Is-Ought gap in compilation
+- Ethical judgment in type systems
+- Correctness and values alignment
 
-*** [#A] 16:00-17:30 AI Integration (Keep Away Room, 2nd Floor) :padl:
-**** Leveraging LLM Reasoning with Dual Horn Programs
+**** Algebraic Stepper (13:45-14:15)
+:PROPERTIES:
+:AUTHORS: Kenichi Asai, Hinano Akiyama
+:AFFILIATION: Ochanomizu University
+:ROOM: Scissors
+:END:
+
+**** Side-Channel Security (14:15-14:30)
+:PROPERTIES:
+:AUTHORS: Cameron Wong et al.
+:INSTITUTIONS: Harvard SEAS, MIT
+:ROOM: Scissors
+:LINKS: Paper attached
+:END:
+
+*** TODO [#A] 16:00-17:30 PADL AI Integration (Keep Away Room)
+**** [#A] Cyber Threat Detection with ASP (16:00-16:30)
+:PROPERTIES:
+:AUTHORS: Fang Li, Fei Zuo, Gopal Gupta
+:ROOM: Keep Away (2nd Floor)
+:RELEVANCE: Security systems integration
+:END:
+
+**** [#A] LLM Reasoning with Dual Horn Programs (16:30-17:00)
 :PROPERTIES:
 :SPEAKER: Paul Tarau
+:AFFILIATION: University of North Texas
 :ROOM: Keep Away (2nd Floor)
 :RELEVANCE: Core AI systems integration
+:TYPE: RECORDED
 :END:
-**** Notes
+***** Key Points
+- LLM reasoning capabilities
+- Integration with formal methods
+- Explainability enhancements
 
-*** [#A] 18:00-19:30 LLM Panel (Scissors Room) 
-**** Semantics-based program manipulation in the age of LLMs
+**** Network Diagnosis Enhancement (17:00-17:30)
 :PROPERTIES:
-:PANELISTS: William J. Bowman, Brigitte Pientka, Satnam Singh, Sam Lindley
-:ROOM: Scissors (2nd Floor)
-:RELEVANCE: Direct relevance to AI systems work
+:SPEAKER: Anduo Wang
+:AFFILIATION: Temple University
+:ROOM: Keep Away (2nd Floor)
+:TYPE: RECORDED
+:LINKS: Pre-print available
 :END:
+
+*** TODO [#A] 18:00-19:30 Types and Meta Theory (Scissors Room)
+**** [#A] Type-Theoretic Framework for Meta-programming (16:00-16:45)
+:PROPERTIES:
+:SPEAKER: Brigitte Pientka
+:AFFILIATION: McGill University
+:ROOM: Scissors (2nd Floor)
+:RELEVANCE: Meta-programming foundations
+:END:
+***** Key Points
+- Certified meta-programming
+- Type system safety
+- Implementation patterns
+
+**** Typed Program Analysis (16:45-17:15)
+:PROPERTIES:
+:SPEAKER: Barry Jay
+:ROOM: Scissors (2nd Floor)
+:END:
+
+*** TODO [#A] 18:00-19:30 LLM Panel Session (Scissors Room)
+:PROPERTIES:
+:TITLE: Semantics-based program manipulation in the age of LLMs
+:ROOM: Scissors (2nd Floor)
+:TRACK: PEPM
+:END:
+**** Panel Members
+- William J. Bowman (UBC)
+- Brigitte Pientka (McGill)
+- Satnam Singh (Groq)
+- Sam Lindley (Edinburgh)
+**** Key Topics
+- LLM integration patterns
+- Verification approaches
+- System safety
+- Meta-programming
+
+* Questions to Ask
+** Tutorial Track
+- Performance characteristics of SMC
+- Integration with existing frameworks
+- Scaling considerations
+
+** PEPM Track
+- Ethical compiler implementation details
+- LLM reasoning framework integration
+- Safety guarantee approaches
+
+** PADL Track
+- ASP integration patterns
+- LLM reasoning implementation
+- Network analysis approaches
+
+* Follow-ups
+** TODO Papers to Read
+- [#A] The Ethical Compiler pre-print
+- [#A] LLM Reasoning with Dual Horn Programs
+- [#B] Network Diagnosis paper
+
+** People to Meet
+- Paul Tarau re: LLM reasoning
+- William J. Bowman re: ethical compilation
+- Brigitte Pientka re: meta-programming
+
+** Implementation Ideas
+- Ethical compiler framework integration
+- LLM reasoning patterns
+- Security analysis approaches
 
 * Local Variables :noexport:
 # Local Variables:
