@@ -38,3 +38,28 @@
 # Local Variables:
 # org-confirm-babel-evaluate: nil
 # End:
+
+* Emacs Configuration
+** Setup
+Add to your =init.el=:
+#+begin_src emacs-lisp
+(load "~/path/to/popl-2025/init.el")
+#+end_src
+
+** Available Commands
+- =popl-2025/tag-session= - Tag current session
+- =popl-2025/set-priority= - Set session priority
+- =popl-2025/generate-daily-agenda= - View daily schedule
+- =popl-2025/mark-for-followup= - Mark for follow-up
+
+** Key Bindings
+Suggested bindings:
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-c p t") 'popl-2025/tag-session)
+(global-set-key (kbd "C-c p p") 'popl-2025/set-priority)
+(global-set-key (kbd "C-c p a") 'popl-2025/generate-daily-agenda)
+(global-set-key (kbd "C-c p f") 'popl-2025/mark-for-followup)
+#+end_src
+
+* License
+MIT

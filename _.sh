@@ -1,144 +1,98 @@
 #!/bin/bash
 
-# Add Friday's schedule focusing on proof systems and final verification sessions
-cat > notes/friday.org << 'END_FRIDAY'
-#+TITLE: POPL 2025 - Friday (Proof Systems)
-#+OPTIONS: toc:2 num:nil
-#+PROPERTY: header-args :tangle yes :mkdirp t
+# Create final emacs-lisp helper functions
+mkdir -p lisp
+cat > lisp/popl-helpers.el << 'END_ELISP'
+;;; popl-helpers.el --- POPL 2025 Conference Note Helpers
 
-* Schedule :proofs:verification:
-** Afternoon - POPL Track (Marco Polo)
-*** [#A] 15:20-16:20 Verification 2
-**** Archmage and CompCertCast: End-to-End Verification
-:PROPERTIES:
-:AUTHORS: Yonghyun Kim et al.
-:INSTITUTION: Seoul National University
-:ROOM: Marco Polo
-:RELEVANCE: Complete system verification pipeline
-:END:
-***** Key Points
-- Integer-pointer casting support
-- End-to-end verification
-- Framework integration
-***** Notes
+;;; Commentary:
+;; Helper functions for managing POPL 2025 conference notes
 
-**** [#B] Formalising Graph Algorithms with Coinduction
-:PROPERTIES:
-:AUTHORS: Donnacha Oisín Kidney, Nicolas Wu
-:INSTITUTIONS: Imperial College London
-:ROOM: Marco Polo
-:END:
-***** Notes
+;;; Code:
+(require 'org)
+(require 'org-agenda)
 
-*** [#A] 19:00-20:00 Proof Assistants (Peek-A-Boo)
-**** Progressful Interpreters for WebAssembly
-:PROPERTIES:
-:AUTHORS: Xiaojia Rao et al.
-:INSTITUTIONS: Imperial College London, NTU
-:ROOM: Peek-A-Boo
-:RELEVANCE: Direct application to Wasm work
-:END:
-***** Key Points
-- Certified verification
-- Performance optimization
-***** Notes
+(defun popl-2025/tag-session (tag)
+  "Add TAG to current session heading."
+  (interactive "sTag: ")
+  (org-set-tags-to (cons tag (org-get-tags))))
 
-**** Unifying compositional verification
-:PROPERTIES:
-:AUTHORS: Yu Zhang et al.
-:INSTITUTIONS: Yale University
-:RELEVANCE: System-wide verification approach
-:END:
-***** Notes
+(defun popl-2025/set-priority (priority)
+  "Set PRIORITY ([#A] [#B] [#C]) for current heading."
+  (interactive "cPriority [A/B/C]: ")
+  (org-priority priority))
 
-* Implementation Focus
-** Verification Integration
-- CompCertCast integration possibilities
-- WebAssembly verification pipeline
-- Compositional approaches
+(defun popl-2025/generate-daily-agenda ()
+  "Generate agenda for current day's sessions."
+  (interactive)
+  (let ((org-agenda-files '("notes")))
+    (org-agenda nil "d")))
 
-** Framework Development
-- Tool integration patterns
-- Performance considerations
-- Safety guarantees
+(defun popl-2025/mark-for-followup ()
+  "Mark current item for follow-up."
+  (interactive)
+  (org-set-property "FOLLOW_UP" "t")
+  (org-set-tags-to (cons "followup" (org-get-tags))))
 
-* Key Questions
-** Technical Deep Dives
-- CompCertCast implementation details
-- WebAssembly interpreter certification
-- Verification scaling approaches
+(provide 'popl-helpers)
+;;; popl-helpers.el ends here
+END_ELISP
 
-** Integration Strategies
-- Framework combination approaches
-- Tool integration patterns
-- Performance implications
+# Add init.el for easy loading
+cat > init.el << 'END_INIT'
+;; Load path for popl helpers
+(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+(require 'popl-helpers)
 
-* Conference Wrap-up
-** Key Takeaways
-- Verification framework advances
-- WebAssembly ecosystem development
-- AI system verification approaches
+;; Org mode customizations
+(setq org-todo-keywords
+      '((sequence "TODO" "IN-PROGRESS" "WAITING" "DONE")))
 
-** Action Items
-- [ ] Framework integration investigation
-- [ ] Tool evaluation for immediate use
-- [ ] Follow-up with key contacts
+(setq org-tag-alist
+      '(("ai" . ?a)
+        ("verification" . ?v)
+        ("wasm" . ?w)
+        ("probabilistic" . ?p)
+        ("followup" . ?f)))
 
-** Research Directions
-- System-wide verification approaches
-- AI/ML system certification
-- Performance optimization patterns
+;; Custom agenda views
+(setq org-agenda-custom-commands
+      '(("p" "POPL Overview"
+         ((agenda "" ((org-agenda-span 'week)
+                     (org-agenda-start-day "2025-01-19")))
+          (tags "followup")
+          (todo "TODO")))))
+END_INIT
 
-* Local Variables :noexport:
-# Local Variables:
-# org-confirm-babel-evaluate: nil
-# End:
-END_FRIDAY
+# Add a final README update
+cat >> README.org << 'END_README'
 
-# Add a script for conference wrap-up report generation
-cat > scripts/generate-report.sh << 'END_REPORT_SCRIPT'
-#!/bin/bash
+* Emacs Configuration
+** Setup
+Add to your =init.el=:
+#+begin_src emacs-lisp
+(load "~/path/to/popl-2025/init.el")
+#+end_src
 
-# Generate conference wrap-up report from notes
-REPORT_FILE="reports/popl-2025-summary.org"
-mkdir -p reports
+** Available Commands
+- =popl-2025/tag-session= - Tag current session
+- =popl-2025/set-priority= - Set session priority
+- =popl-2025/generate-daily-agenda= - View daily schedule
+- =popl-2025/mark-for-followup= - Mark for follow-up
 
-cat > "$REPORT_FILE" << EOF
-#+TITLE: POPL 2025 Conference Summary
-#+DATE: $(date +%Y-%m-%d)
-#+AUTHOR: Jason Walsh
-#+OPTIONS: toc:2 num:nil
-#+PROPERTY: header-args :tangle yes :mkdirp t
+** Key Bindings
+Suggested bindings:
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-c p t") 'popl-2025/tag-session)
+(global-set-key (kbd "C-c p p") 'popl-2025/set-priority)
+(global-set-key (kbd "C-c p a") 'popl-2025/generate-daily-agenda)
+(global-set-key (kbd "C-c p f") 'popl-2025/mark-for-followup)
+#+end_src
 
-* Conference Overview
-** Key Themes
-- AI System Verification
-- WebAssembly Evolution
-- Probabilistic Programming
-- Proof Systems
-
-** Technical Highlights
-$(for f in notes/*.org; do
-    echo "*** $(basename $f .org)"
-    grep -A 2 "^\*\* Key" "$f" 2>/dev/null | sed 's/^/    /'
-done)
-
-** Action Items
-$(grep -h "\[.\]" notes/*.org 2>/dev/null | sort -u | sed 's/^/- /')
-
-** Follow-ups
-$(grep -h "^** Papers to Read" -A 3 notes/*.org 2>/dev/null | sed 's/^/  /')
-
-* Local Variables :noexport:
-# Local Variables:
-# org-confirm-babel-evaluate: nil
-# End:
-EOF
-
-echo "Generated conference summary at $REPORT_FILE"
-END_REPORT_SCRIPT
-chmod +x scripts/generate-report.sh
+* License
+MIT
+END_README
 
 git add .
-git commit -m "Add Friday schedule and conference report generator"
+git commit -m "Add emacs-lisp helpers and final documentation"
 git push origin main
