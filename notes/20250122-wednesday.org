@@ -1,64 +1,138 @@
-#+TITLE: POPL 2025 - Wednesday (Probabilistic Programming)
+#+TITLE: POPL 2025 - Wednesday Sessions
+#+DATE: <2025-01-22 Wed>
+#+AUTHOR: AYGP System
 #+OPTIONS: toc:2 num:nil
 #+PROPERTY: header-args :tangle yes :mkdirp t
+#+CATEGORY: POPL2025
 
-* Schedule :probabilistic:systems:
-** Late Afternoon - POPL Track (Marco Polo)
-*** [#A] 17:00-18:20 Probabilistic Programming 1
-**** A quantitative probabilistic relational Hoare logic
+* Wednesday, January 22, 2025
+
+** 11:00-12:00 Keynote: Finding Good Programs by Avoiding Bad Ones
+:PROPERTIES:
+:LOCATION: Marco Polo
+:DURATION: 60m
+:SPEAKER: Loris D'Antoni
+:AFFILIATION: UCSD
+:SESSION_TYPE: Keynote
+:END:
+
+*** Key Points
+- Program synthesis strategies
+- Error avoidance techniques
+- Constraint-based approaches
+
+** 12:40-14:00 Automata and Temporal Properties
+:PROPERTIES:
+:LOCATION: Marco Polo
+:CHAIR: Thomas Ball
+:CHAIR_AFFILIATION: Microsoft Research
+:SESSION_TYPE: Paper Session
+:END:
+
+*** 12:40-13:00 Coinductive Proofs for Temporal Hyperliveness
+:PROPERTIES:
+:SPEAKERS: Arthur Correnson, Bernd Finkbeiner
+:AFFILIATION: CISPA Helmholtz Center for Information Security
+:MATERIALS: https://github.com/acorrenson/hyco-popl-2025/tree/main
+:END:
+
+**** Key Points
+- Temporal hyperliveness properties
+- Coinductive proof techniques
+- Implementation strategies
+
+*** 13:00-13:20 Derivative-Guided Symbolic Execution
+:PROPERTIES:
+:SPEAKERS: Yongwei Yuan, Zhe Zhou, Julia Belyakova, Suresh Jagannathan
+:AFFILIATION: Purdue University
+:END:
+
+**** Key Points
+- Symbolic execution techniques
+- Derivative-based guidance
+- Performance optimization
+
+*** 13:20-13:40 Symbolic Automata: ω-Regularity Modulo Theories
+:PROPERTIES:
+:SPEAKERS: Margus Veanes, Thomas Ball, Gabriel Ebner, Ekaterina Zhuchko
+:AFFILIATIONS: Microsoft Research, Tallinn University of Technology
+:END:
+
+**** Key Points
+- Symbolic automata theory
+- ω-regularity properties
+- Theory integration
+
+*** 13:40-14:00 Translation of Temporal Logic for Infinite-State Reactive Synthesis
+:PROPERTIES:
+:SPEAKERS: Philippe Heim, Rayna Dimitrova
+:AFFILIATION: CISPA Helmholtz Center for Information Security
+:MATERIALS: https://arxiv.org/abs/2411.07078
+:END:
+
+**** Key Points
+- Temporal logic translation
+- Infinite-state synthesis
+- Reactive system verification
+
+** 17:00-18:20 Probabilistic Programming 1
+:PROPERTIES:
+:LOCATION: Marco Polo
+:SESSION_TYPE: Paper Session
+:PRIORITY: A
+:END:
+
+*** A Quantitative Probabilistic Relational Hoare Logic [#B]
 :PROPERTIES:
 :AUTHORS: Martin Avanzini, Gilles Barthe, Benjamin Gregoire, Davide Davoli
 :INSTITUTIONS: Inria, MPI-SP
-:ROOM: Marco Polo
 :RELEVANCE: Formal verification of probabilistic systems
 :END:
-***** Key Points
-- Focus on quantitative assertions
-- Overcomes randomness alignment restrictions
-***** Notes
 
-**** [#A] Approximate Relational Reasoning for Higher-Order Probabilistic Programs
+**** Key Points
+- Quantitative assertions
+- Overcoming randomness alignment
+- Relational verification
+
+*** Approximate Relational Reasoning for Higher-Order Probabilistic Programs [#A]
 :PROPERTIES:
 :AUTHORS: Philipp G. Haselwarter et al.
 :INSTITUTIONS: Aarhus University, NYU
 :RELEVANCE: Direct application to AI system verification
 :END:
-***** Key Points
-- Higher-order approximate reasoning
-- Integration with separation logic
-***** Notes
 
-**** [#B] Compositional imprecise probability
+**** Key Points
+- Higher-order reasoning
+- Separation logic integration
+- Approximation techniques
+
+*** Compositional Imprecise Probability [#B]
 :PROPERTIES:
 :AUTHORS: Jack Liell-Cock, Sam Staton
 :INSTITUTION: University of Oxford
 :RELEVANCE: Uncertainty handling in systems
 :END:
-***** Notes
 
-* Key Questions
-** Verification Approaches
-- Integration with existing frameworks
-- Scaling to production systems
-- Handling uncertainty bounds
+**** Key Points
+- Compositional approaches
+- Imprecise probability
+- System uncertainty
 
-** Implementation Considerations
-- Performance characteristics
-- Integration patterns
-- Tool support needed
+* Follow-up Items
+** Papers to Review [#A]
+- [ ] Approximate Relational Reasoning paper
+- [ ] Quantitative Hoare logic paper
+- [ ] Temporal Logic Translation paper
 
-* Follow-ups
-** Papers to Read
-- [#A] Approximate Relational Reasoning paper
-- [#A] Quantitative Hoare logic paper for system verification
+** Research Connections [#A]
+- [ ] Connect with Gilles Barthe about verification approaches
+- [ ] Discuss with Sam Staton about compositional methods
+- [ ] Follow up with Loris D'Antoni about program synthesis
 
-** People to Meet
-- Gilles Barthe re: verification approaches
-- Sam Staton re: compositional approaches
-
-** Implementation Ideas
-- Framework integration possibilities
-- Verification pipeline enhancements
+** Implementation Ideas [#B]
+- [ ] Investigate framework integration possibilities
+- [ ] Consider verification pipeline enhancements
+- [ ] Explore tool support requirements
 
 * Local Variables :noexport:
 # Local Variables:
