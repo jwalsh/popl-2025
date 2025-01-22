@@ -2,12 +2,12 @@
 #+DATE: <2025-01-22 Wed>
 #+AUTHOR: AYGP System
 #+OPTIONS: toc:2 num:nil
-#+PROPERTY: header-args :tangle yes :mkdirp t
+#+PROPERTY: header-args :tangle yes :mkdirp t :session 
 #+CATEGORY: POPL2025
 
 * Wednesday, January 22, 2025
 
-** 11:00-12:00 Keynote: Finding Good Programs by Avoiding Bad Ones
+** DONE 11:00-12:00 Keynote: Finding Good Programs by Avoiding Bad Ones
 :PROPERTIES:
 :LOCATION: Marco Polo
 :DURATION: 60m
@@ -29,7 +29,7 @@
 :SESSION_TYPE: Paper Session
 :END:
 
-*** 12:40-13:00 Coinductive Proofs for Temporal Hyperliveness
+*** DONE [#B] 12:40-13:00 Coinductive Proofs for Temporal Hyperliveness
 :PROPERTIES:
 :SPEAKERS: Arthur Correnson, Bernd Finkbeiner
 :AFFILIATION: CISPA Helmholtz Center for Information Security
@@ -41,39 +41,395 @@
 - Coinductive proof techniques
 - Implementation strategies
 
-*** 13:00-13:20 Derivative-Guided Symbolic Execution
+**** Example Implementation
+#+begin_src ocaml
+(* Basic coinductive stream type *)
+type 'a stream = Cons of 'a * (unit -> 'a stream)
+
+(* Create an infinite stream *)
+let rec ones = Cons(1, fun () -> ones)
+
+(* Take first n elements *)
+let rec take n = function
+  | Cons(x, _) when n <= 0 -> []
+  | Cons(x, next) -> x :: take (n-1) (next())
+
+(* Temporal property check *)
+let rec eventually p = function
+  | Cons(x, next) -> p x || eventually p (next())
+
+(* Example usage *)
+let test_stream = take 5 ones
+let has_one = eventually (fun x -> x = 1) ones
+#+end_src
+
+#+begin_src elisp
+;; Elisp version of stream processing
+(defun make-stream (init next)
+  (cons init (lambda () (make-stream (funcall next init) next))))
+
+(defun stream-ref (stream n)
+  (if (zerop n)
+      (car stream)
+    (stream-ref (funcall (cdr stream)) (1- n))))
+
+(defun make-ones-stream ()
+  (make-stream 1 (lambda (x) 1)))
+
+;; Test stream generation
+(let ((ones (make-ones-stream)))
+  (list (stream-ref ones 0)
+        (stream-ref ones 1)
+        (stream-ref ones 2)))
+#+end_src
+
+**** Notes
+- Coinductive proofs allow reasoning about infinite behaviors
+- Implementation combines functional and temporal aspects
+- Stream processing demonstrates key concepts
+
+*** DONE [#C] 13:00-13:20 Derivative-Guided Symbolic Execution
 :PROPERTIES:
 :SPEAKERS: Yongwei Yuan, Zhe Zhou, Julia Belyakova, Suresh Jagannathan
 :AFFILIATION: Purdue University
 :END:
+
+#+begin_src elisp
+  (defun remove-item (item list)
+    "Remove ITEM from LIST."
+    (cond
+     ((null list) nil)                ; Base case: empty list
+     ((equal item (car list)) (cdr list)) ; Found it, return rest of list
+     (t (cons (car list) (remove-item item (cdr list))))))
+#+end_src
+
+#+RESULTS:
+: remove-item
+
+#+begin_src elisp
+(let ((my-list '(1 2 3 4 5)))
+  (remove-item 3 my-list)) 
+#+end_src
+
+#+RESULTS:
+| 1 | 2 | 4 | 5 |
+
+#+begin_src ocaml-ts
+let rec remove_item item list =
+  match list with
+  | [] -> [] (* Base case: empty list *)
+  | hd :: tl when hd = item -> tl (* Found it, return the rest of the list *)
+  | hd :: tl -> hd :: remove_item item tl (* Not found, keep searching *)
+#+end_src
 
 **** Key Points
 - Symbolic execution techniques
 - Derivative-based guidance
 - Performance optimization
 
-*** 13:20-13:40 Symbolic Automata: ω-Regularity Modulo Theories
+*** DONE [#C] 13:20-13:40 Symbolic Automata: ω-Regularity Modulo Theories
 :PROPERTIES:
 :SPEAKERS: Margus Veanes, Thomas Ball, Gabriel Ebner, Ekaterina Zhuchko
 :AFFILIATIONS: Microsoft Research, Tallinn University of Technology
 :END:
+
+https://popl25.sigplan.org/details/POPL-2025-popl-research-papers/2/Symbolic-Automata-omega-Regularity-Modulo-Theories
 
 **** Key Points
 - Symbolic automata theory
 - ω-regularity properties
 - Theory integration
 
-*** 13:40-14:00 Translation of Temporal Logic for Infinite-State Reactive Synthesis
+**** Example Implementation
+#+begin_src ocaml
+(* Symbolic Automata basics *)
+module SymbolicAutomata = struct
+  type state = int
+  type symbol = int  (* Simplified for example *)
+  
+  type transition = {
+    source: state;
+    guard: symbol -> bool;
+    target: state
+  }
+  
+  type automaton = {
+    states: state list;
+    initial: state;
+    accepting: state list;
+    transitions: transition list
+  }
+  
+  (* Check if a symbol satisfies a guard *)
+  let satisfies guard symbol = guard symbol
+  
+  (* Find next states from current state on symbol *)
+  let next_states auto state symbol =
+    List.filter_map
+      (fun t -> 
+        if t.source = state && satisfies t.guard symbol
+        then Some t.target
+        else None)
+      auto.transitions
+      
+  (* Run automaton on input sequence *)
+  let rec run auto states = function
+    | [] -> List.exists (fun s -> List.mem s auto.accepting) states
+    | symbol :: rest ->
+        let next = List.concat_map (fun s -> next_states auto s symbol) states in
+        run auto next rest
+end
+
+(* Example usage *)
+let even_numbers =
+  let is_even x = x mod 2 = 0 in
+  {
+    states = [0; 1];
+    initial = 0;
+    accepting = [0];
+    transitions = [
+      { source = 0; guard = is_even; target = 0 };
+      { source = 0; guard = (fun x -> not (is_even x)); target = 1 };
+      { source = 1; guard = is_even; target = 0 };
+      { source = 1; guard = (fun x -> not (is_even x)); target = 1 }
+    ]
+  }
+#+end_src
+
+#+begin_src elisp
+;; Elisp implementation of simple symbolic automata
+(cl-defstruct (automaton (:constructor make-automaton))
+  states initial accepting transitions)
+
+(cl-defstruct (transition (:constructor make-transition))
+  source guard target)
+
+(defun make-even-automaton ()
+  (make-automaton
+   :states '(0 1)
+   :initial 0
+   :accepting '(0)
+   :transitions
+   (list
+    (make-transition :source 0 :guard #'evenp :target 0)
+    (make-transition :source 0 :guard #'oddp :target 1)
+    (make-transition :source 1 :guard #'evenp :target 0)
+    (make-transition :source 1 :guard #'oddp :target 1))))
+
+(defun next-states (auto state symbol)
+  (cl-loop for t in (automaton-transitions auto)
+           when (and (eq (transition-source t) state)
+                    (funcall (transition-guard t) symbol))
+           collect (transition-target t)))
+
+(defun run-automaton (auto input)
+  (let ((states (list (automaton-initial auto))))
+    (dolist (symbol input states)
+      (setq states
+            (cl-loop for s in states
+                     append (next-states auto s symbol))))))
+
+;; Test the automaton
+(let ((auto (make-even-automaton)))
+  (run-automaton auto '(2 4 6)))  ;; Should end in accepting state
+#+end_src
+
+**** Notes
+- Symbolic representation enables efficient state handling
+- Guards implement theory predicates
+- Implementation shows basic automata operations
+
+*** TODO [#B] 13:40-14:00 Translation of Temporal Logic for Infinite-State Reactive Synthesis
 :PROPERTIES:
 :SPEAKERS: Philippe Heim, Rayna Dimitrova
 :AFFILIATION: CISPA Helmholtz Center for Information Security
 :MATERIALS: https://arxiv.org/abs/2411.07078
 :END:
 
+https://popl25.sigplan.org/details/POPL-2025-popl-research-papers/52/Translation-of-Temporal-Logic-for-Efficient-Infinite-State-Reactive-Synthesis
+
+https://arxiv.org/pdf/2411.07078
+
+
 **** Key Points
 - Temporal logic translation
 - Infinite-state synthesis
 - Reactive system verification
+
+**** Example Implementation
+#+begin_src ocaml
+(* Basic LTL formula representation *)
+type ltl_formula =
+  | Atom of string
+  | Not of ltl_formula
+  | And of ltl_formula * ltl_formula
+  | Or of ltl_formula * ltl_formula
+  | Next of ltl_formula
+  | Until of ltl_formula * ltl_formula
+  | Always of ltl_formula
+  | Eventually of ltl_formula
+
+(* Translate LTL to automata-friendly form *)
+let rec normalize = function
+  | Always f -> Not (Eventually (Not (normalize f)))
+  | Eventually f -> Until (Atom "true", normalize f)
+  | And (f1, f2) -> And (normalize f1, normalize f2)
+  | Or (f1, f2) -> Or (normalize f1, normalize f2)
+  | Next f -> Next (normalize f)
+  | Until (f1, f2) -> Until (normalize f1, normalize f2)
+  | Not f -> Not (normalize f)
+  | f -> f
+
+(* Simple reactive system type *)
+type 'a reactive_system = {
+  init: unit -> 'a;
+  step: 'a -> string -> 'a * string;
+  property: ltl_formula
+}
+
+(* Example safety property *)
+let mutex_property = 
+  Always (Not (And (Atom "cs1", Atom "cs2")))
+
+(* Example system synthesis *)
+let synthesize_mutex () =
+  let state = ref 0 in
+  {
+    init = (fun () -> 0);
+    step = (fun s evt ->
+      match evt, s with
+      | "req1", 0 -> (1, "grant1")
+      | "req2", 0 -> (2, "grant2")
+      | "rel1", 1 -> (0, "idle")
+      | "rel2", 2 -> (0, "idle")
+      | _ -> (s, "idle"));
+    property = mutex_property
+  }
+#+end_src
+
+#+begin_src elisp
+;; Elisp implementation of temporal logic structures
+(cl-defstruct ltl-formula
+  type   ; 'atom, 'not, 'and, 'or, 'next, 'until, 'always, 'eventually
+  args)  ; Arguments (atoms or sub-formulas)
+
+(defun make-ltl-atom (name)
+  (make-ltl-formula :type 'atom :args name))
+
+(defun make-ltl-always (formula)
+  (make-ltl-formula :type 'always :args (list formula)))
+
+(defun make-ltl-eventually (formula)
+  (make-ltl-formula :type 'eventually :args (list formula)))
+
+;; Example mutex property
+(defun make-mutex-property ()
+  (make-ltl-always
+   (make-ltl-formula
+    :type 'not
+    :args (list
+           (make-ltl-formula
+            :type 'and
+            :args (list
+                  (make-ltl-atom "cs1")
+                  (make-ltl-atom "cs2")))))))
+
+;; Simple reactive system simulator
+(defun simulate-reactive-system (system inputs)
+  (let ((state (funcall (plist-get system :init)))
+        (outputs nil))
+    (dolist (input inputs (reverse outputs))
+      (cl-destructuring-bind (new-state output)
+          (funcall (plist-get system :step) state input)
+        (setq state new-state)
+        (push output outputs)))))
+
+;; Test the system
+(let ((mutex-system
+       (list :init (lambda () 0)
+             :step (lambda (state input)
+                    (pcase (cons state input)
+                      ('(0 . "req1") '(1 "grant1"))
+                      ('(0 . "req2") '(2 "grant2"))
+                      ('(1 . "rel1") '(0 "idle"))
+                      ('(2 . "rel2") '(0 "idle"))
+                      (_ (cons state "idle")))))))
+  (simulate-reactive-system 
+   mutex-system 
+   '("req1" "req2" "rel1" "req2")))
+#+end_src
+
+**** Notes
+- Translation preserves temporal properties
+- Synthesis guarantees correctness
+- Implementation demonstrates:
+  + LTL formula representation
+  + Property normalization
+  + Basic synthesis approach
+
+**** References 
+
+- https://arxiv.org/pdf/1005.3200
+
+- LTL to automata: Spot
+- SMT solver: Z3
+- Game solver: RPGSolver
+- Fixpoints: MuVal
+- Raboniel
+- TeMoS
+- Direct translation: RPGSolver
+
+
+***** LTL to Automata: Spot
+#+BEGIN_SRC shell
+spot -f "F p & G !q"
+#+END_SRC
+
+***** SMT Solver: Z3
+#+BEGIN_SRC python
+from z3 import *
+
+x = Int('x')
+y = Int('y')
+
+s = Solver()
+
+s.add(x > 2, y < 10, x + 2*y == 7)
+
+result = s.check()
+
+if result == sat:
+    print("Solution found:")
+    print("x =", s.model()[x])
+    print("y =", s.model()[y])
+elif result == unsat:
+    print("No solution exists")
+else:
+    print("Unknown result")
+
+#+END_SRC
+
+
+***** Game Solver: RPGSolver
+#+BEGIN_SRC shell
+rpgsolve --ltl "F p U q"
+#+END_SRC
+
+***** Fixpoints: MuVal
+#+BEGIN_SRC shell
+muval --fixpoint "nu X. p & [a]X"
+#+END_SRC
+
+***** TODO Raboniel
+No example provided
+
+***** TODO TeMoS
+No example provided
+
+***** Direct Translation: RPGSolver
+#+BEGIN_SRC shell
+rpgsolve --direct "F p -> G q"
+#+END_SRC
 
 ** 17:00-18:20 Probabilistic Programming 1
 :PROPERTIES:
@@ -82,7 +438,7 @@
 :PRIORITY: A
 :END:
 
-*** A Quantitative Probabilistic Relational Hoare Logic [#B]
+*** TODO [#A] A Quantitative Probabilistic Relational Hoare Logic 
 :PROPERTIES:
 :AUTHORS: Martin Avanzini, Gilles Barthe, Benjamin Gregoire, Davide Davoli
 :INSTITUTIONS: Inria, MPI-SP
@@ -94,7 +450,90 @@
 - Overcoming randomness alignment
 - Relational verification
 
-*** Approximate Relational Reasoning for Higher-Order Probabilistic Programs [#A]
+**** Example Implementation
+#+begin_src ocaml
+(* Basic probabilistic programming constructs *)
+type 'a distribution = {
+  sample: unit -> 'a;
+  expectation: ('a -> float) -> float
+}
+
+(* Bernoulli distribution *)
+let bernoulli p = {
+  sample = (fun () -> Random.float 1.0 <= p);
+  expectation = (fun f -> p *. f true +. (1.0 -. p) *. f false)
+}
+
+(* Relational Hoare triple representation *)
+type ('a, 'b) rel_hoare_triple = {
+  pre: 'a * 'b -> bool;
+  post: 'a * 'b -> bool;
+  prob_bound: float
+}
+
+(* Example verification *)
+let verify_coupling dist1 dist2 triple =
+  let samples = 1000 in
+  let successes = ref 0 in
+  for i = 1 to samples do
+    let x = dist1.sample () in
+    let y = dist2.sample () in
+    if triple.pre (x, y) && triple.post (x, y) then
+      incr successes
+  done;
+  float_of_int !successes /. float_of_int samples <= triple.prob_bound
+
+(* Test case: Coupling of two biased coins *)
+let test_coupling () =
+  let p1 = bernoulli 0.7 in
+  let p2 = bernoulli 0.3 in
+  let triple = {
+    pre = (fun (x, y) -> true);
+    post = (fun (x, y) -> x = not y);
+    prob_bound = 0.5
+  } in
+  verify_coupling p1 p2 triple
+#+end_src
+
+#+begin_src elisp
+;; Elisp probabilistic programming simulation
+(defun make-bernoulli (p)
+  "Create a Bernoulli distribution with parameter P."
+  (lambda ()
+    (< (random 1.0) p)))
+
+(cl-defstruct rel-hoare-triple
+  pre    ; Predicate on two values
+  post   ; Predicate on two values
+  bound) ; Probability bound
+
+(defun verify-coupling (dist1 dist2 triple n-samples)
+  "Verify a relational property between two distributions."
+  (let ((successes 0))
+    (dotimes (_ n-samples)
+      (let ((x (funcall dist1))
+            (y (funcall dist2)))
+        (when (and (funcall (rel-hoare-triple-pre triple) x y)
+                  (funcall (rel-hoare-triple-post triple) x y))
+          (setq successes (1+ successes)))))
+    (/ (float successes) n-samples)))
+
+;; Example usage
+(let* ((p1 (make-bernoulli 0.7))
+       (p2 (make-bernoulli 0.3))
+       (triple (make-rel-hoare-triple
+                :pre (lambda (x y) t)
+                :post (lambda (x y) (not (eq x y)))
+                :bound 0.5)))
+  (verify-coupling p1 p2 triple 1000))
+#+end_src
+
+**** Notes
+- Implementation demonstrates coupling proofs
+- Quantitative bounds on probabilistic properties
+- Practical verification through sampling
+
+*** TODO [#A] Approximate Relational Reasoning for Higher-Order Probabilistic Programs 
 :PROPERTIES:
 :AUTHORS: Philipp G. Haselwarter et al.
 :INSTITUTIONS: Aarhus University, NYU
@@ -106,7 +545,7 @@
 - Separation logic integration
 - Approximation techniques
 
-*** Compositional Imprecise Probability [#B]
+*** TODO [#B] Compositional Imprecise Probability 
 :PROPERTIES:
 :AUTHORS: Jack Liell-Cock, Sam Staton
 :INSTITUTION: University of Oxford
