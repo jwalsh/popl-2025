@@ -31,3 +31,6 @@ reports/*
 # Local config
 .dir-locals.el
 .envrc
+# Paper downloads
+papers/
+*.pdf

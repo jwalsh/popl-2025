@@ -161,3 +161,20 @@ Quick notes from terminal:
 #+begin_src sh
 ./scripts/quick-note.sh "ethical-compiler" "Interesting points about type safety"
 #+end_src
+
+* Paper Management
+The =papers/= directory (not tracked in git) contains downloaded papers organized as follows:
+
+- =papers/arxiv/= :: arXiv papers, named by their ID
+- =papers/slides/= :: Presentation slides
+- =papers/supplementary/= :: Supplementary materials
+
+To download a paper:
+#+begin_src shell
+./scripts/fetch-paper.sh https://arxiv.org/pdf/2411.07078
+#+end_src
+
+The script will:
+1. Download the PDF
+2. Create a metadata file
+3. Organize by source (arXiv, etc.)
