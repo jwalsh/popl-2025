@@ -4,7 +4,7 @@
 
 * Schedule :ai:llm:verification:rooms:
 ** Morning - Tutorial Track (Paper Room, 2nd Floor)
-*** TODO [#A] 11:00-12:30 Stateless Model Checking Tutorial
+*** DONE [#A] 11:00-12:30 Stateless Model Checking Tutorial :paper:ai:llm:verification:rooms:
 :PROPERTIES:
 :ROOM: Paper (2nd Floor)
 :TRACK: Tutorial
@@ -27,7 +27,7 @@
 **** Practical Session
 
 ** Afternoon - PEPM Track (Scissors Room, 2nd Floor)
-*** TODO [#A] 13:00-14:30 Language Design
+*** TODO [#A] 13:00-14:30 Language Design :scissors:ai:llm:verification:rooms:
 **** The Ethical Compiler (Invited Talk)
 :PROPERTIES:
 :SPEAKER: William J. Bowman
@@ -56,7 +56,7 @@
 :LINKS: Paper attached
 :END:
 
-*** TODO [#A] 16:00-17:30 PADL AI Integration (Keep Away Room)
+*** TODO [#A] 16:00-17:30 PADL AI Integration (Keep Away Room) :keep-away:ai:llm:verification:rooms:
 **** [#A] Cyber Threat Detection with ASP (16:00-16:30)
 :PROPERTIES:
 :AUTHORS: Fang Li, Fei Zuo, Gopal Gupta
@@ -86,7 +86,7 @@
 :LINKS: Pre-print available
 :END:
 
-*** TODO [#A] 18:00-19:30 Types and Meta Theory (Scissors Room)
+*** TODO [#A] 18:00-19:30 Types and Meta Theory (Scissors Room) :scissors:ai:llm:verification:rooms:
 **** [#A] Type-Theoretic Framework for Meta-programming (16:00-16:45)
 :PROPERTIES:
 :SPEAKER: Brigitte Pientka
@@ -105,7 +105,7 @@
 :ROOM: Scissors (2nd Floor)
 :END:
 
-*** TODO [#A] 18:00-19:30 LLM Panel Session (Scissors Room)
+*** TODO [#A] 18:00-19:30 LLM Panel Session (Scissors Room) :scissors:ai:llm:verification:rooms:
 :PROPERTIES:
 :TITLE: Semantics-based program manipulation in the age of LLMs
 :ROOM: Scissors (2nd Floor)

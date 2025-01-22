@@ -1,5 +1,7 @@
 ;; Load path for popl helpers
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+
+(add-to-list 'load-path (expand-file-name "lisp"))
 (require 'popl-helpers)
 
 ;; Org mode customizations
