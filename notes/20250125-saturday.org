@@ -1,0 +1,54 @@
+#+TITLE: POPL 2025 - Saturday Sessions
+#+DATE: <2025-01-25 Sat>
+#+AUTHOR: AYGP System
+#+CATEGORY: POPL2025
+
+* Saturday, January 25, 2025
+
+** 11:00-12:00 Keynote: Finding Good Programs by Avoiding Bad Ones
+:PROPERTIES:
+:LOCATION: Marco Polo
+:DURATION: 60m
+:SPEAKER:  Loris D'Antoni
+:AFFILIATION: UCSD
+:SESSION_TYPE: Keynote
+:END:
+
+*** Notes
+- Keynote presentation by Loris D'Antoni
+- Focus on program synthesis and verification
+- Key themes:
+  + Program space navigation
+  + Constraint-based synthesis
+  + Error avoidance strategies
+
+** 12:40-13:00 Coinductive Proofs for Temporal Hyperliveness
+:PROPERTIES:
+:LOCATION: Marco Polo
+:DURATION: 20m
+:SPEAKER: Arthur Correnson, Bernd Finkbeiner
+:AFFILIATION: CISPA Helmholtz Center for Information Security
+:SESSION_TYPE: Talk
+:CHAIR: Thomas Ball
+:CHAIR_AFFILIATION: Microsoft Research
+:MATERIALS: [[https://github.com/acorrenson/hyco-popl-2025/tree/main][Presentation Materials]]
+:END:
+
+*** Session Details
+- Part of: Automata and Temporal Properties track
+- Chair: Thomas Ball (Microsoft Research)
+
+*** Key Points
+- Focus on temporal hyperliveness properties
+- Coinductive proof techniques
+- Implementation and verification strategies
+
+*** Resources
+- GitHub Repository: [[https://github.com/acorrenson/hyco-popl-2025/tree/main][hyco-popl-2025]]
+- Related Papers:
+  + TBD: Add paper references
+
+*** TODO Action Items
+- [ ] Review presentation materials
+- [ ] Follow up on implementation details
+- [ ] Check coinductive proof techniques
