@@ -1,0 +1,5 @@
+# POPL 2025 Paper URLs
+# Format: <session_date>|<paper_title>|<url>
+2025-01-22|Translation of Temporal Logic for Infinite-State Reactive Synthesis|https://arxiv.org/pdf/2411.07078
+2025-01-22|Coinductive Proofs for Temporal Hyperliveness|https://github.com/acorrenson/hyco-popl-2025
+2025-01-22|Symbolic Automata: ω-Regularity Modulo Theories|https://popl25.sigplan.org/details/POPL-2025-popl-research-papers/2/Symbolic-Automata-omega-Regularity-Modulo-Theories
