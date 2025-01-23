@@ -38,6 +38,12 @@
 ;; Better code block syntax highlighting
 (setq org-src-fontify-natively t)
 
+;; Add local lisp directory to load path
+(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+
+;; Load track-papers package
+(require 'track-papers)
+
 ;; Ensure we have OCaml environment variables set
 (setenv "OCAML_VERSION" "4.14.0")
 (setenv "OPAM_SWITCH_PREFIX" "/usr/local/opt/ocaml")
